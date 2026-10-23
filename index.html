@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Key Engineering Office</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1b2430;--mute:#667085;--line:#dfe3e8;--accent:#0b5cad;--red:#c62828;--amber:#b26a00;--green:#1b7f3b;--redbg:#fdecea;--ambbg:#fff4e0;--grnbg:#e8f5ec}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b222b;--ink:#e8ecf1;--mute:#97a3b2;--line:#2c3643;--accent:#5aa2ee;--red:#ff8a80;--amber:#ffc266;--green:#6fd08c;--redbg:#3a1d1b;--ambbg:#3a2c12;--grnbg:#173323}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+header h1{font-size:17px;margin:0;flex:1;min-width:160px}
+header .who{color:var(--mute);font-size:13px}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+nav{display:flex;gap:4px;padding:10px 16px 0;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line)}
+nav button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 12px;white-space:nowrap;color:var(--mute)}
+nav button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+nav .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:5px;border-radius:10px;background:var(--line);font-size:12px;text-align:center}
+nav .n.hot{background:var(--red);color:#fff}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.tile b{display:block;font-size:24px}.tile span{color:var(--mute);font-size:13px}
+.tile.red b{color:var(--red)}.tile.amber b{color:var(--amber)}.tile.green b{color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.wrap{overflow-x:auto}
+.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.pill.red{background:var(--redbg);color:var(--red)}.pill.amber{background:var(--ambbg);color:var(--amber)}.pill.green{background:var(--grnbg);color:var(--green)}.pill.grey{background:var(--line);color:var(--mute)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.bar .sp{flex:1}
+.mute{color:var(--mute)}.small{font-size:13px}
+.err{background:var(--redbg);color:var(--red);padding:10px 12px;border-radius:8px;margin-bottom:12px}
+.note{background:var(--ambbg);color:var(--amber);padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:13px}
+#login{max-width:340px;margin:12vh auto;padding:0 16px}
+#login input{width:100%;padding:10px;margin:6px 0;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+#login button{width:100%;margin-top:8px;padding:10px}
+details summary{cursor:pointer;color:var(--accent)}
+.hide{display:none!important}
+@media (max-width:600px){main{padding:10px}th,td{padding:6px 4px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<div id="login" class="hide">
+  <h1>Key Engineering Office</h1>
+  <p class="mute small">Sign in with your normal Key Engineering account.</p>
+  <div id="loginErr" class="err hide"></div>
+  <input id="em" type="email" placeholder="Email" autocomplete="username">
+  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="primary" id="go">Sign in</button>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <h1>Key Engineering Office</h1>
+    <span class="who" id="who"></span>
+    <span class="who" id="synced"></span>
+    <button id="refresh">Refresh</button>
+    <button id="out">Sign out</button>
+  </header>
+  <nav id="tabs"></nav>
+  <main>
+    <div id="msg"></div>
+    <section id="v-overview"></section>
+    <section id="v-week" class="hide"></section>
+    <section id="v-due" class="hide"></section>
+    <section id="v-repairs" class="hide"></section>
+    <section id="v-po" class="hide"></section>
+  </main>
+</div>
+
+<script>
+// Same Supabase project as the Crane Service Report, Job Manager and KEPO apps.
+// The publishable key is meant to be public — row-level security in Supabase is what protects the data.
+const SB = {url:'https://eyerpokgadrgxticqzez.supabase.co', key:'sb_publishable_FsyUdlUOTgA51pkAy5pNiA_AsHqq6Ed'};
+const RATES = {nt:50, ot:64, dt:73, callout:100, mile:0.70};   // normal, OT1, OT2, call-out, per mile
+const KINDS = {Service:'Service', Inspection:'Inspection', LOLER:'LOLER'};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const gbp = n => '£' + n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const slug = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse = s => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||'')); return m ? new Date(+m[1],+m[2]-1,+m[3]) : null; };
+const addDays = (s,n) => { const d=parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const monday = s => { const d=parse(s)||new Date(); const k=(d.getDay()+6)%7; d.setDate(d.getDate()-k); return iso(d); };
+const uk = s => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||'')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+const todayIso = () => iso(new Date());
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem('ke_office_'+k)); }catch(e){ return null; } },
+                set(k,v){ try{ localStorage.setItem('ke_office_'+k, JSON.stringify(v)); }catch(e){} },
+                del(k){ try{ localStorage.removeItem('ke_office_'+k); }catch(e){} } };
+
+// ---------- auth + data ----------
+async function token(){
+  const s = store.get('session');
+  if(!s) throw new Error('Not signed in');
+  if(s.expires_at - 60 > Date.now()/1000) return s.access_token;
+  const res = await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});
+  if(!res.ok){ store.del('session'); throw new Error('Session expired — please sign in again'); }
+  return saveSession(await res.json()).access_token;
+}
+function saveSession(j){
+  const s = {access_token:j.access_token, refresh_token:j.refresh_token, expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600), email:(j.user&&j.user.email)||(store.get('session')||{}).email||'', uid:(j.user&&j.user.id)||(store.get('session')||{}).uid||''};
+  store.set('session', s); return s;
+}
+async function api(path, opts){
+  const t = await token();
+  const res = await fetch(SB.url+path, Object.assign({}, opts, {headers:Object.assign({apikey:SB.key, Authorization:'Bearer '+t}, (opts&&opts.headers)||{})}));
+  if(!res.ok){ let m=''; try{ const j=await res.json(); m=j.message||j.error||''; }catch(e){} const e=new Error(`${res.status} ${m}`.trim()); e.status=res.status; throw e; }
+  return res;
+}
+async function getAll(table, query){
+  const out=[]; for(let off=0;;off+=1000){
+    const r = await (await api(`/rest/v1/${table}?${query}&limit=1000&offset=${off}`)).json();
+    out.push(...r); if(r.length<1000) break;
+  } return out;
+}
+
+let D = {jobs:[], reports:[], comps:{}, pos:[], profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
+
+async function load(){
+  $('msg').innerHTML='';
+  const problems=[];
+  const [jobs, reports, comps, pos, prof] = await Promise.all([
+    getAll('js_docs','select=id,data,updated_at&kind=eq.job&deleted=eq.false').catch(e=>{problems.push('Job sheets: '+e.message); return null;}),
+    getAll('reports','select=id,report_no,customer,crane_no,id_no,visit_type,report_date,engineer,next_due,site,data,updated_at&order=report_date.desc').catch(e=>{problems.push('Reports: '+e.message); return [];}),
+    getAll('completions','select=key,done_date,note').catch(e=>{problems.push('Completions: '+e.message); return [];}),
+    getAll('po_requests','select=*&order=created_at.desc').catch(e=>{problems.push('Purchase orders: '+e.message); return [];}),
+    api('/rest/v1/profiles?select=name,role&id=eq.'+encodeURIComponent((store.get('session')||{}).uid||'')).then(r=>r.json()).catch(()=>[])
+  ]);
+  D.jobsBlocked = jobs === null; D.jobs = jobs || [];
+  D.reports = reports; D.profile = prof[0]||null;
+  D.comps = {}; comps.forEach(c=>D.comps[c.key]=c);
+  D.pos = pos; D.loaded = new Date();
+  if(problems.length) $('msg').innerHTML = '<div class="err">'+problems.map(esc).join('<br>')+'</div>';
+  if(D.jobsBlocked) $('msg').innerHTML += '<div class="note">This login can\'t see job sheets. Add the office user to the Job Manager members list in Supabase (table <b>js_members</b>).</div>';
+  $('synced').textContent = 'Updated '+D.loaded.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ---------- engineer names (Job Manager uses "Dave" and "Dave Boler" for the same person) ----------
+function nameMap(){
+  const names = new Set();
+  D.jobs.forEach(j=> (j.data.engineers||[]).forEach(n=>{ n=String(n||'').trim(); if(n) names.add(n); }));
+  D.reports.forEach(r=>{ const n=String(r.engineer||'').trim(); if(n) names.add(n); });
+  const list=[...names], map={};
+  list.forEach(n=>{
+    const longer = list.filter(o=> o!==n && o.toLowerCase().split(/\s+/)[0]===n.toLowerCase() && o.includes(' '));
+    map[n.toLowerCase()] = (!n.includes(' ') && longer.length===1) ? longer[0] : n;
+  });
+  return n => { n=String(n||'').trim(); return n ? (map[n.toLowerCase()]||n) : 'Unassigned'; };
+}
+
+// ---------- calculations ----------
+function weekJobs(start){
+  const end = addDays(start,6), canon = nameMap(), rows=[];
+  D.jobs.forEach(j=>{
+    const d=j.data, entries=(d.time||[]).filter(t=> t.date>=start && t.date<=end);
+    const hasCallout = d.callout && ((d.date||'')>=start && (d.date||'')<=end);
+    if(!entries.length && !hasCallout) return;
+    const engs=(d.engineers||[]).map(canon), n=Math.max(1,engs.length);
+    let nt=0,ot=0,dt=0,mile=0;
+    entries.forEach(t=>{ nt+=num(t.nt); ot+=num(t.ot); dt+=num(t.dt); mile+=num(t.mile); });
+    const labour = (nt*RATES.nt + ot*RATES.ot + dt*RATES.dt)*n, mileage = mile*RATES.mile, call = hasCallout?RATES.callout:0;
+    rows.push({id:j.id, job:d.job||j.id, customer:d.customerName||d.customer||'', site:d.site||'', type:d.type||'', status:d.status||'',
+      engs: engs.length?engs:['Unassigned'], n, nt,ot,dt,mile, labour, mileage, call, total:labour+mileage+call,
+      repairs:d.repairStatus||'', materials:(d.materials&&d.materials.length)||0});
+  });
+  rows.sort((a,b)=> String(a.job).localeCompare(String(b.job)));
+  return rows;
+}
+function dueList(){
+  const canon=nameMap(), latest=new Map(), tod=parse(todayIso());
+  D.reports.forEach(r=>{
+    const k=[r.customer,r.crane_no,r.id_no].map(v=>String(v||'').trim().toLowerCase()).join('|')+'|'+(r.visit_type||'Service');
+    const p=latest.get(k);
+    if(!p || (r.report_date||'')>(p.report_date||'')) latest.set(k,r);
+  });
+  const out=[];
+  latest.forEach(r=>{
+    const lo=r.data&&r.data.loler, due = r.visit_type==='LOLER' ? ((lo&&lo.nextexam)||r.next_due) : r.next_due;
+    const dd=parse(due); if(!dd) return;
+    out.push({r, kind:r.visit_type||'Service', iso:iso(dd), days:Math.round((dd-tod)/864e5), eng:canon(r.engineer)});
+  });
+  out.sort((a,b)=>a.days-b.days); return out;
+}
+function repairsList(){
+  const canon=nameMap(), byEq=new Map(), cutoff=addDays(todayIso(),-30), open=[], done=[];
+  D.reports.forEach(r=>{ const k=[r.customer,r.crane_no,r.id_no].map(v=>String(v||'').trim().toLowerCase()).join('|'); if(!byEq.has(k)) byEq.set(k,[]); byEq.get(k).push(r); });
+  byEq.forEach(vs=>{
+    vs.sort((a,b)=>(a.report_date||'').localeCompare(b.report_date||''));
+    const latest=new Map();
+    vs.forEach(r=>{ ((r.data&&r.data.items)||[]).forEach(it=>{ if(it&&it.label&&it.status) latest.set(slug(it.group)+'__'+slug(it.label),{r,it}); }); });
+    latest.forEach(x=>{
+      if(x.it.status!=='URGENT' && x.it.status!=='ATTN') return;
+      const key=((x.r.data&&x.r.data.reportNo)||x.r.report_no||x.r.id)+'|'+slug(x.it.group)+'__'+slug(x.it.label);
+      const comp=D.comps[key];
+      const item={r:x.r,it:x.it,eng:canon(x.r.engineer),comp};
+      if(comp){ if((comp.done_date||'')>=cutoff) done.push(item); }
+      else if(!(x.it.work&&String(x.it.work).trim())) open.push(item);
+    });
+  });
+  open.sort((a,b)=>(a.it.status==='URGENT'?0:1)-(b.it.status==='URGENT'?0:1)||(a.r.report_date||'').localeCompare(b.r.report_date||''));
+  return {open,done};
+}
+
+// ---------- views ----------
+let weekStart = monday(todayIso()), dueWin = 30, dueEng = '', dueKind = '', tab = 'overview';
+
+function pill(days){ return days<0?`<span class="pill red">OVERDUE ${-days}d</span>`: days===0?'<span class="pill red">TODAY</span>': days<=7?`<span class="pill amber">${days}d</span>`:`<span class="pill grey">${days}d</span>`; }
+
+function viewOverview(){
+  const due=dueList(), rep=repairsList(), jobs=weekJobs(monday(todayIso()));
+  const over=due.filter(d=>d.days<0).length, soon=due.filter(d=>d.days>=0&&d.days<=30).length;
+  const urgent=rep.open.filter(x=>x.it.status==='URGENT').length;
+  const wkTotal=jobs.reduce((s,j)=>s+j.total,0);
+  const pending=D.pos.filter(p=>p.status==='pending').length;
+  const engs={}; due.filter(d=>d.days<=30).forEach(d=>{ (engs[d.eng]=engs[d.eng]||{o:0,s:0}); d.days<0?engs[d.eng].o++:engs[d.eng].s++; });
+  $('v-overview').innerHTML = `
+  <div class="tiles">
+    <div class="tile ${over?'red':''}"><b>${over}</b><span>Overdue services / inspections</span></div>
+    <div class="tile ${soon?'amber':''}"><b>${soon}</b><span>Due in next 30 days</span></div>
+    <div class="tile ${rep.open.length?'red':'green'}"><b>${rep.open.length}</b><span>Repairs outstanding (${urgent} urgent)</span></div>
+    <div class="tile"><b>${jobs.length}</b><span>Jobs this week (${gbp(wkTotal)})</span></div>
+    <div class="tile ${pending?'amber':''}"><b>${pending}</b><span>POs awaiting approval</span></div>
+  </div>
+  <div class="card"><h2>Upcoming by engineer <span class="mute small">next 30 days + overdue</span></h2>
+  ${Object.keys(engs).length?`<div class="wrap"><table><tr><th>Engineer</th><th class="r">Overdue</th><th class="r">Due in 30 days</th></tr>${Object.keys(engs).sort().map(e=>`<tr><td>${esc(e)}</td><td class="r">${engs[e].o?`<span class="pill red">${engs[e].o}</span>`:'–'}</td><td class="r">${engs[e].s||'–'}</td></tr>`).join('')}</table></div>`:'<p class="mute">Nothing due. Services and inspections only appear here once a report has a next-due date.</p>'}
+  </div>`;
+}
+
+function viewWeek(){
+  const rows=weekJobs(weekStart), by={};
+  rows.forEach(j=> j.engs.forEach(e=>{ (by[e]=by[e]||[]).push(j); }));
+  const tot=rows.reduce((s,j)=>s+j.total,0);
+  let html=`<div class="bar"><button id="wPrev">◀</button><b>Week starting ${uk(weekStart)}</b> <span class="mute small">to ${uk(addDays(weekStart,6))}</span><button id="wNext">▶</button><button id="wNow">This week</button><span class="sp"></span><button id="wCsv" ${rows.length?'':'disabled'}>Download CSV</button></div>
+  <div class="note">Costed at normal £50, OT1 £64, OT2 £73 per hour (× number of engineers named), £100 call-out, £0.70/mile. Materials still need adding by the office. Mileage is counted once per job, not per engineer.</div>
+  <div class="tiles"><div class="tile"><b>${rows.length}</b><span>Jobs</span></div><div class="tile"><b>${gbp(tot)}</b><span>Labour + mileage + call-outs</span></div><div class="tile"><b>${Object.keys(by).length}</b><span>Engineers working</span></div></div>`;
+  if(!rows.length) html+='<div class="card mute">No job sheets with time booked in this week.</div>';
+  Object.keys(by).sort().forEach(e=>{
+    const js=by[e];
+    html+=`<div class="card"><h2>${esc(e)} <span class="mute small">${js.length} job${js.length===1?'':'s'}</span></h2><div class="wrap"><table>
+    <tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Status</th><th class="r">Normal</th><th class="r">OT1</th><th class="r">OT2</th><th class="r">Miles</th><th class="r">Crew</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.customer)}<div class="mute small">${esc(j.site)}</div></td><td>${esc(j.type)}</td><td><span class="pill ${j.status==='Complete'?'green':'amber'}">${esc(j.status||'–')}</span>${j.repairs&&j.repairs!=='Done'?`<div class="small mute">Repairs: ${esc(j.repairs)}</div>`:''}</td><td class="r">${j.nt||''}</td><td class="r">${j.ot||''}</td><td class="r">${j.dt||''}</td><td class="r">${j.mile||''}</td><td class="r">${j.n}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    </table></div></div>`;
+  });
+  $('v-week').innerHTML=html;
+  $('wPrev').onclick=()=>{weekStart=addDays(weekStart,-7);viewWeek();};
+  $('wNext').onclick=()=>{weekStart=addDays(weekStart,7);viewWeek();};
+  $('wNow').onclick=()=>{weekStart=monday(todayIso());viewWeek();};
+  $('wCsv').onclick=()=>{
+    const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const lines=[['Engineer','Job','Customer','Site','Type','Status','Normal hrs','OT1 hrs','OT2 hrs','Crew','Miles','Labour','Mileage','Call-out','Total'].map(q).join(',')];
+    rows.forEach(j=>j.engs.forEach(e=>lines.push([e,j.job,j.customer,j.site,j.type,j.status,j.nt,j.ot,j.dt,j.n,j.mile,j.labour.toFixed(2),j.mileage.toFixed(2),j.call.toFixed(2),j.total.toFixed(2)].map(q).join(','))));
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines.join('\r\n')],{type:'text/csv'})); a.download='jobs_week_'+weekStart+'.csv'; a.click();
+  };
+}
+
+function viewDue(){
+  const all=dueList(), engs=[...new Set(all.map(d=>d.eng))].sort();
+  const list=all.filter(d=>d.days<=dueWin && (!dueEng||d.eng===dueEng) && (!dueKind||d.kind===dueKind));
+  $('v-due').innerHTML=`<div class="bar">
+    <select id="dEng"><option value="">All engineers</option>${engs.map(e=>`<option ${e===dueEng?'selected':''}>${esc(e)}</option>`).join('')}</select>
+    <select id="dKind"><option value="">Service / Inspection / LOLER</option>${Object.keys(KINDS).map(k=>`<option ${k===dueKind?'selected':''}>${k}</option>`).join('')}</select>
+    <select id="dWin">${[7,30,60,90,365].map(n=>`<option value="${n}" ${n===dueWin?'selected':''}>Next ${n} days</option>`).join('')}</select>
+    <span class="mute small">${list.length} shown</span></div>
+    <div class="card wrap">${list.length?`<table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Last visit</th></tr>
+    ${list.map(d=>`<tr><td>${uk(d.iso)}</td><td>${pill(d.days)}</td><td>${esc(d.kind)}</td><td>${esc(d.r.customer)}<div class="mute small">${esc(d.r.site||'')}</div></td><td>${esc(d.r.crane_no||'')}${d.r.id_no?` <span class="mute small">ID ${esc(d.r.id_no)}</span>`:''}</td><td>${esc(d.eng)}</td><td>${uk(d.r.report_date)}</td></tr>`).join('')}</table>`:'<span class="mute">Nothing due in this window.</span>'}</div>`;
+  $('dEng').onchange=e=>{dueEng=e.target.value;viewDue();};
+  $('dKind').onchange=e=>{dueKind=e.target.value;viewDue();};
+  $('dWin').onchange=e=>{dueWin=+e.target.value;viewDue();};
+}
+
+function viewRepairs(){
+  const {open,done}=repairsList();
+  const row=x=>`<tr><td>${x.it.status==='URGENT'?'<span class="pill red">URGENT</span>':'<span class="pill amber">REQ ATTN</span>'}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`;
+  $('v-repairs').innerHTML=`<div class="card"><h2>Repairs required <span class="mute small">${open.length} to book in</span></h2><div class="wrap">${open.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${open.map(row).join('')}</table>`:'<span class="mute">No outstanding repairs.</span>'}</div></div>
+  <div class="card"><h2>Repaired in last 30 days <span class="mute small">${done.length}</span></h2><div class="wrap">${done.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${done.map(row).join('')}</table>`:'<span class="mute">None recorded.</span>'}</div></div>`;
+}
+
+function viewPo(){
+  const admin = D.pos.some(p=>p.requested_by!==(store.get('session')||{}).uid);
+  $('v-po').innerHTML=`<div class="card"><h2>Purchase orders <span class="mute small">${D.pos.length}</span></h2><div class="wrap">${D.pos.length?`<table><tr><th>Status</th><th>PO</th><th>Engineer</th><th>Site / ref</th><th>Description</th><th class="r">Est.</th><th>Requested</th><th></th></tr>
+  ${D.pos.map(p=>`<tr><td><span class="pill ${p.status==='approved'?'green':p.status==='rejected'?'red':'amber'}">${esc(p.status)}</span></td><td>${esc(p.po_number||'')}</td><td>${esc(p.engineer_name)}</td><td>${esc(p.site_ref)}</td><td>${esc(p.description)}</td><td class="r">${esc(p.est_value||'')}</td><td>${uk((p.created_at||'').slice(0,10))}</td><td>${p.status==='pending'&&admin?`<button data-a="approve_po" data-id="${esc(p.id)}">Approve</button> <button data-a="reject_po" data-id="${esc(p.id)}">Reject</button>`:''}</td></tr>`).join('')}</table>`:'<span class="mute">No purchase order requests.</span>'}</div></div>`;
+  $('v-po').querySelectorAll('button[data-a]').forEach(b=>b.onclick=async()=>{
+    b.disabled=true;
+    try{ await api('/rest/v1/rpc/'+b.dataset.a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:b.dataset.id})}); await refresh(); }
+    catch(e){ $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; b.disabled=false; }
+  });
+}
+
+// ---------- shell ----------
+const TABS=[['overview','Overview'],['week','Week by engineer'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders']];
+function render(){
+  const due=dueList(), rep=repairsList();
+  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length};
+  $('tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${badge[k]?`<span class="n ${k==='due'?'hot':''}">${badge[k]}</span>`:''}</button>`).join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;store.set('tab',tab);render();});
+  TABS.forEach(([k])=>$('v-'+k).classList.toggle('hide',k!==tab));
+  ({overview:viewOverview,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo})[tab]();
+}
+async function refresh(){ $('refresh').disabled=true; try{ await load(); render(); }catch(e){ if(!store.get('session')) showLogin(e.message); else $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; } finally{ $('refresh').disabled=false; } }
+function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').classList.toggle('hide',!m); $('loginErr').textContent=m||''; }
+async function showApp(){ $('login').classList.add('hide'); $('app').classList.remove('hide'); const s=store.get('session')||{}; $('who').textContent=s.email||''; tab=store.get('tab')||'overview'; if(!TABS.some(t=>t[0]===tab)) tab='overview'; await refresh(); }
+
+$('go').onclick=async()=>{
+  $('go').disabled=true;
+  try{
+    const res=await fetch(SB.url+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:$('em').value.trim(),password:$('pw').value})});
+    const j=await res.json();
+    if(!res.ok) throw new Error(j.error_description||j.msg||'Sign-in failed');
+    saveSession(j); $('pw').value=''; await showApp();
+  }catch(e){ showLogin(e.message); }
+  $('go').disabled=false;
+};
+$('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') $('go').click(); });
+$('out').onclick=()=>{ store.del('session'); showLogin(''); };
+$('refresh').onclick=refresh;
+setInterval(()=>{ if(store.get('session') && !document.hidden) refresh(); }, 5*60*1000);
+if(store.get('session')) showApp(); else showLogin('');
+</script>
+</body>
+</html>
