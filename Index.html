@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Key Engineering Office</title>
+<style>
+:root{
+ --bg:#eef2f6;--card:#ffffff;--ink:#172334;--mute:#65758a;--line:#d8e0e9;
+ --accent:#f2a900;--accent-dark:#cc8500;--navy:#101d2d;--navy2:#1b2e43;
+ --red:#c62828;--amber:#a96500;--green:#147a43;
+ --redbg:#fff0ef;--ambbg:#fff5df;--grnbg:#e8f7ed;
+ --shadow:0 8px 24px rgba(18,35,54,.07);--radius:16px;
+}
+@media(prefers-color-scheme:dark){
+ :root{--bg:#0d141d;--card:#151f2b;--ink:#eef3f8;--mute:#9babbc;--line:#2b3949;
+ --accent:#ffbf26;--accent-dark:#e7a300;--navy:#080e16;--navy2:#142235;
+ --red:#ff8c84;--amber:#ffca6a;--green:#6fdda0;--redbg:#3b2021;--ambbg:#3b3019;--grnbg:#173527;
+ --shadow:0 8px 24px rgba(0,0,0,.18)}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;padding:15px clamp(14px,3vw,32px);display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16);border-bottom:4px solid var(--accent)}
+header h1{font-size:19px;letter-spacing:.2px;margin:0;flex:1;min-width:190px;font-weight:800}
+header h1:before{content:"KE";display:inline-grid;place-items:center;width:36px;height:36px;margin-right:11px;background:var(--accent);color:#111c29;border-radius:10px;font-size:13px;font-weight:950;vertical-align:middle;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+header .who{color:#d1dbe6;font-size:12px}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 13px rgba(0,0,0,.1);border-color:var(--accent)}
+button:active{transform:translateY(0)}
+header button{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22);color:white}
+header button:hover{background:rgba(255,255,255,.16)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#172334;font-weight:800}
+button:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+nav{display:flex;gap:5px;padding:8px clamp(10px,3vw,32px) 0;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:70px;z-index:15;box-shadow:0 3px 10px rgba(18,35,54,.04)}
+nav button{border:0;border-bottom:3px solid transparent;border-radius:10px 10px 0 0;background:none;padding:12px 15px;white-space:nowrap;color:var(--mute);box-shadow:none;font-weight:650}
+nav button:hover{transform:none;box-shadow:none;background:var(--bg)}
+nav button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:850;background:linear-gradient(0deg,rgba(242,169,0,.12),transparent)}
+nav .n{display:inline-block;min-width:21px;padding:1px 7px;margin-left:7px;border-radius:99px;background:var(--line);font-size:11px;text-align:center;font-weight:800}
+nav .n.hot{background:var(--red);color:#fff}
+main{max-width:1500px;margin:0 auto;padding:clamp(12px,2vw,26px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(14px,2vw,22px);margin-bottom:17px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin:0 0 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;font-weight:800;letter-spacing:.1px}
+.card h2:before{content:"";width:4px;height:19px;background:var(--accent);border-radius:5px;margin-right:1px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px;margin-bottom:18px}
+.tile{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow);min-height:112px}
+.tile:after{content:"";position:absolute;right:-19px;top:-24px;width:82px;height:82px;border-radius:50%;background:var(--accent);opacity:.09}
+.tile b{display:block;font-size:clamp(25px,3vw,34px);line-height:1.15;margin-bottom:8px;letter-spacing:-.8px;font-weight:850;font-variant-numeric:tabular-nums}
+.tile span{color:var(--mute);font-size:12px;font-weight:700;letter-spacing:.2px}
+.tile.red{border-top:3px solid var(--red)}.tile.amber{border-top:3px solid var(--accent)}.tile.green{border-top:3px solid var(--green)}
+.tile.red b{color:var(--red)}.tile.amber b{color:var(--amber)}.tile.green b{color:var(--green)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.08em;background:var(--bg);position:sticky;top:0}
+th:first-child{border-radius:8px 0 0 8px}th:last-child{border-radius:0 8px 8px 0}
+tbody tr:hover,table tr:hover td{background:rgba(242,169,0,.045)}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.wrap{overflow:auto;border-radius:10px}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:850;letter-spacing:.035em;white-space:nowrap}
+.pill.red{background:var(--redbg);color:var(--red)}.pill.amber{background:var(--ambbg);color:var(--amber)}.pill.green{background:var(--grnbg);color:var(--green)}.pill.grey{background:var(--line);color:var(--mute)}
+.bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--card);border:1px solid var(--line);padding:12px;border-radius:14px;box-shadow:var(--shadow)}
+.bar .sp{flex:1}
+.bar select,.bar input{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 11px;min-height:40px}
+.mute{color:var(--mute)}.small{font-size:12px}
+.err{background:var(--redbg);color:var(--red);padding:12px 14px;border:1px solid currentColor;border-radius:12px;margin-bottom:12px}
+.note{background:var(--ambbg);color:var(--amber);padding:12px 14px;border:1px solid rgba(242,169,0,.3);border-radius:12px;margin-bottom:14px;font-size:12px}
+#login{max-width:390px;margin:12vh auto;padding:28px;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+#login h1{margin-top:0;font-size:26px;letter-spacing:-.7px}
+#login h1:before{content:"KE";display:inline-grid;place-items:center;width:43px;height:43px;margin-right:11px;background:var(--accent);color:#172334;border-radius:12px;font-size:14px;font-weight:950;vertical-align:middle}
+#login input{width:100%;padding:12px;margin:6px 0;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+#login button{width:100%;margin-top:10px;padding:12px}
+details summary{cursor:pointer;color:var(--accent-dark);font-weight:700}
+.hide{display:none!important}
+#msg:empty{display:none}
+
+/* Control-room layer */
+.commandbar{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(150px,.7fr);gap:12px;margin:0 0 18px}
+.command-search{position:relative;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px 13px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.command-search .search-icon{font-size:20px;color:var(--accent-dark)}
+.command-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;padding:7px 0}
+.command-search .hint{font-size:10px;color:var(--mute);white-space:nowrap;border:1px solid var(--line);padding:3px 6px;border-radius:5px}
+.command-status{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;border-radius:15px;padding:12px 15px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.command-status .status-dot{width:10px;height:10px;border-radius:50%;background:#62d995;box-shadow:0 0 0 5px rgba(98,217,149,.14);flex-shrink:0}
+.command-status b{display:block;font-size:12px}.command-status span{display:block;color:#c8d4e1;font-size:11px}
+.search-results{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin:-8px 0 18px;overflow:hidden}
+.search-results .result-head{padding:10px 14px;background:var(--bg);font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.search-results .result{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer}
+.search-results .result:hover{background:rgba(242,169,0,.08)}
+.search-results .result-type{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:800}
+.search-results .result-main{font-weight:750;overflow-wrap:anywhere}
+.search-results .result-sub{font-size:11px;color:var(--mute);overflow-wrap:anywhere}
+.search-results .result-go{font-size:11px;color:var(--accent-dark);font-weight:800}
+.control-hero{position:relative;overflow:hidden;background:linear-gradient(115deg,#101d2d 0%,#1d344b 68%,#2a4055 100%);color:#fff;border-radius:19px;padding:23px clamp(16px,3vw,30px);margin-bottom:17px;box-shadow:var(--shadow)}
+.control-hero:after{content:"";position:absolute;right:-55px;top:-100px;width:280px;height:280px;border:35px solid rgba(242,169,0,.13);border-radius:50%;pointer-events:none}
+.control-hero .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.17em;color:#f2b92c;font-weight:900}
+.control-hero h2{font-size:clamp(22px,3vw,32px);line-height:1.12;margin:8px 0 8px;letter-spacing:-.7px;max-width:700px}
+.control-hero p{margin:0;color:#d0dce8;font-size:13px;max-width:650px}
+.hero-bottom{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px;position:relative;z-index:1}
+.hero-bottom button{font-size:12px;font-weight:800}
+.hero-bottom .hero-light{background:var(--accent);color:#142033;border-color:var(--accent)}
+.hero-bottom .hero-dark{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.25)}
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:17px}
+.alert-card{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:var(--card);text-align:left;box-shadow:var(--shadow);width:100%}
+.alert-card .alert-symbol{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--bg);font-size:18px;flex-shrink:0}
+.alert-card strong{display:block;font-size:22px;line-height:1.1}.alert-card span{display:block;font-size:11px;color:var(--mute);font-weight:700;margin-top:4px}
+.alert-card.danger .alert-symbol{background:var(--redbg)}.alert-card.warning .alert-symbol{background:var(--ambbg)}.alert-card.good .alert-symbol{background:var(--grnbg)}
+.alert-card:hover{border-color:var(--accent)}
+.section-kicker{font-size:10px;color:var(--mute);font-weight:900;letter-spacing:.13em;text-transform:uppercase;margin:2px 0 10px}
+.overview-lower{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:16px;align-items:start}
+.mini-action-list{display:grid;gap:8px}
+.mini-action{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--card);text-align:left;width:100%;box-shadow:none}
+.mini-action .mini-icon{width:33px;height:33px;display:grid;place-items:center;border-radius:9px;background:var(--bg);font-size:15px}
+.mini-action b{display:block;font-size:12px}.mini-action small{display:block;color:var(--mute);font-size:10px}
+.empty-state{padding:20px;text-align:center;color:var(--mute);font-size:12px}
+@media(max-width:700px){.commandbar{grid-template-columns:1fr}.overview-lower{grid-template-columns:1fr}.search-results .result{grid-template-columns:70px minmax(0,1fr)}.search-results .result-go{display:none}.control-hero{padding:19px}.control-hero:after{right:-170px}}
+
+@media(max-width:700px){
+ header{top:0;padding:12px;gap:8px}header h1{font-size:16px;min-width:145px}
+ header h1:before{width:31px;height:31px;margin-right:7px}
+ header .who{font-size:11px}
+ nav{top:60px;padding-left:8px;padding-right:8px}
+ nav button{padding:11px 12px}
+ main{padding:10px}
+ .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .tile{padding:14px 12px;min-height:100px}
+ .tile b{font-size:27px}
+ .card{padding:13px;border-radius:13px}
+ th,td{padding:9px 7px;font-size:12px}
+ .bar{gap:7px}
+}
+@media(max-width:390px){.tiles{grid-template-columns:1fr 1fr}.tile b{font-size:24px}header h1{min-width:100%}}
+@media print{
+ header,nav,.bar button,#refresh,#out,.commandbar,.search-results{display:none!important}
+ body{background:#fff;color:#111}
+ main{max-width:none;padding:0}
+ .card,.tile{box-shadow:none;break-inside:avoid;border-color:#bbb}
+}
+</style>
+</head>
+<body>
+
+<div id="login" class="hide">
+  <h1>Key Engineering Office</h1>
+  <p class="mute small">Sign in with your normal Key Engineering account.</p>
+  <div id="loginErr" class="err hide"></div>
+  <input id="em" type="email" placeholder="Email" autocomplete="username">
+  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="primary" id="go">Sign in</button>
+  <button id="forgot" type="button" style="background:none;border:0;box-shadow:none;color:var(--accent-dark);font-size:12px;margin-top:4px">Forgot password?</button>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <h1>Key Engineering Office</h1>
+    <span class="who" id="who"></span>
+    <span class="who" id="synced"></span>
+    <button id="refresh">Refresh</button>
+    <button id="out">Sign out</button>
+  </header>
+  <nav id="tabs"></nav>
+  <main>
+    <div class="commandbar">
+      <div class="command-search">
+        <span class="search-icon">⌕</span>
+        <input id="globalSearch" type="search" placeholder="Search jobs, customers, cranes, reports, purchase orders…" autocomplete="off" aria-label="Search all office records">
+        <span class="hint">SEARCH</span>
+      </div>
+      <div class="command-status">
+        <span class="status-dot"></span>
+        <div><b>KEY ENGINEERING CONTROL ROOM</b><span id="controlStatus">Live session · data status updates on refresh</span></div>
+      </div>
+    </div>
+    <div id="searchResults" class="search-results hide"></div>
+    <div id="msg"></div>
+    <section id="v-overview"></section>
+    <section id="v-today" class="hide"></section>
+    <section id="v-bookings" class="hide"></section>
+    <section id="v-week" class="hide"></section>
+    <section id="v-due" class="hide"></section>
+    <section id="v-repairs" class="hide"></section>
+    <section id="v-po" class="hide"></section>
+  </main>
+</div>
+
+<script>
+// Same Supabase project as the Crane Service Report, Job Manager and KEPO apps.
+// The publishable key is meant to be public — row-level security in Supabase is what protects the data.
+const SB = {url:'https://eyerpokgadrgxticqzez.supabase.co', key:'sb_publishable_FsyUdlUOTgA51pkAy5pNiA_AsHqq6Ed'};
+const RATES = {nt:50, ot:64, dt:73, callout:100, mile:0.70};   // normal, OT1, OT2, call-out, per mile
+const KINDS = {Service:'Service', Inspection:'Inspection', LOLER:'LOLER'};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const gbp = n => '£' + n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const slug = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+const iso = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse = s => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||'')); return m ? new Date(+m[1],+m[2]-1,+m[3]) : null; };
+const addDays = (s,n) => { const d=parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const monday = s => { const d=parse(s)||new Date(); const k=(d.getDay()+6)%7; d.setDate(d.getDate()-k); return iso(d); };
+const uk = s => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||'')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+const todayIso = () => iso(new Date());
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem('ke_office_'+k)); }catch(e){ return null; } },
+                set(k,v){ try{ localStorage.setItem('ke_office_'+k, JSON.stringify(v)); }catch(e){} },
+                del(k){ try{ localStorage.removeItem('ke_office_'+k); }catch(e){} } };
+
+function csvDownload(name, header, rows){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const text=[header].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=name; a.click();
+}
+
+// ---------- auth + data ----------
+async function token(){
+  const s = store.get('session');
+  if(!s) throw new Error('Not signed in');
+  if(s.expires_at - 60 > Date.now()/1000) return s.access_token;
+  const res = await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});
+  if(!res.ok){ store.del('session'); throw new Error('Session expired — please sign in again'); }
+  return saveSession(await res.json()).access_token;
+}
+function saveSession(j){
+  const s = {access_token:j.access_token, refresh_token:j.refresh_token, expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600), email:(j.user&&j.user.email)||(store.get('session')||{}).email||'', uid:(j.user&&j.user.id)||(store.get('session')||{}).uid||''};
+  store.set('session', s); return s;
+}
+async function api(path, opts){
+  const t = await token();
+  const res = await fetch(SB.url+path, Object.assign({}, opts, {headers:Object.assign({apikey:SB.key, Authorization:'Bearer '+t}, (opts&&opts.headers)||{})}));
+  if(!res.ok){ let m=''; try{ const j=await res.json(); m=j.message||j.error||''; }catch(e){} const e=new Error(`${res.status} ${m}`.trim()); e.status=res.status; throw e; }
+  return res;
+}
+async function getAll(table, query){
+  const out=[]; for(let off=0;;off+=1000){
+    const r = await (await api(`/rest/v1/${table}?${query}&limit=1000&offset=${off}`)).json();
+    out.push(...r); if(r.length<1000) break;
+  } return out;
+}
+
+let D = {bookings:[], people:[], phones:{}, mats:{}, jobs:[], reports:[], comps:{}, pos:[], profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
+
+async function load(){
+  $('msg').innerHTML='';
+  const problems=[];
+  const [jobs, reports, comps, pos, prof, mats, bks, people, phones] = await Promise.all([
+    getAll('js_docs','select=id,data,updated_at&kind=eq.job&deleted=eq.false').catch(e=>{problems.push('Job sheets: '+e.message); return null;}),
+    getAll('reports','select=id,report_no,customer,crane_no,id_no,visit_type,report_date,engineer,next_due,site,data,updated_at&order=report_date.desc').catch(e=>{problems.push('Reports: '+e.message); return [];}),
+    getAll('completions','select=key,done_date,note').catch(e=>{problems.push('Completions: '+e.message); return [];}),
+    getAll('po_requests','select=*&order=created_at.desc').catch(e=>{problems.push('Purchase orders: '+e.message); return [];}),
+    api('/rest/v1/profiles?select=name,role&id=eq.'+encodeURIComponent((store.get('session')||{}).uid||'')).then(r=>r.json()).catch(()=>[]),
+    getAll('office_materials','select=job_id,amount').catch(e=>{problems.push('Materials: '+e.message); return [];}),
+    getAll('bookings','select=*&order=created_at.desc').catch(e=>{problems.push('Bookings: '+e.message); return [];}),
+    getAll('profiles','select=id,name,role&order=name.asc').catch(()=>[]),
+    getAll('engineer_phones','select=user_id,phone').catch(()=>[])
+  ]);
+  D.jobsBlocked = jobs === null; D.jobs = jobs || [];
+  D.reports = reports; D.profile = prof[0]||null;
+  D.comps = {}; comps.forEach(c=>D.comps[c.key]=c);
+  D.pos = pos; D.bookings = bks; D.people = people; D.phones = {}; phones.forEach(x=>D.phones[x.user_id]=x.phone); D.mats = {}; mats.forEach(m=>D.mats[m.job_id]=num(m.amount)); D.loaded = new Date();
+  if(problems.length) $('msg').innerHTML = '<div class="err">'+problems.map(esc).join('<br>')+'</div>';
+  if(D.jobsBlocked) $('msg').innerHTML += '<div class="note">This login can\'t see job sheets. Add the office user to the Job Manager members list in Supabase (table <b>js_members</b>).</div>';
+  $('synced').textContent = 'Updated '+D.loaded.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ---------- engineer names (Job Manager uses "Dave" and "Dave Boler" for the same person) ----------
+function nameMap(){
+  const names = new Set();
+  D.jobs.forEach(j=> (j.data.engineers||[]).forEach(n=>{ n=String(n||'').trim(); if(n) names.add(n); }));
+  D.reports.forEach(r=>{ const n=String(r.engineer||'').trim(); if(n) names.add(n); });
+  const list=[...names], map={};
+  list.forEach(n=>{
+    const longer = list.filter(o=> o!==n && o.toLowerCase().split(/\s+/)[0]===n.toLowerCase() && o.includes(' '));
+    map[n.toLowerCase()] = (!n.includes(' ') && longer.length===1) ? longer[0] : n;
+  });
+  return n => { n=String(n||'').trim(); return n ? (map[n.toLowerCase()]||n) : 'Unassigned'; };
+}
+
+// ---------- calculations ----------
+function weekJobs(start){
+  const end = addDays(start,6), canon = nameMap(), rows=[];
+  D.jobs.forEach(j=>{
+    const d=j.data, entries=(d.time||[]).filter(t=> t.date>=start && t.date<=end);
+    const hasCallout = d.callout && ((d.date||'')>=start && (d.date||'')<=end);
+    if(!entries.length && !hasCallout) return;
+    const engs=(d.engineers||[]).map(canon), n=Math.max(1,engs.length);
+    let nt=0,ot=0,dt=0,mile=0;
+    entries.forEach(t=>{ nt+=num(t.nt); ot+=num(t.ot); dt+=num(t.dt); mile+=num(t.mile); });
+    const labour = (nt*RATES.nt + ot*RATES.ot + dt*RATES.dt)*n, mileage = mile*RATES.mile, call = hasCallout?RATES.callout:0, mat = D.mats[j.id]||0;
+    rows.push({id:j.id, job:d.job||j.id, customer:d.customerName||d.customer||'', site:d.site||'', type:d.type||'', status:d.status||'',
+      engs: engs.length?engs:['Unassigned'], n, nt,ot,dt,mile, labour, mileage, call, mat, total:labour+mileage+call+mat,
+      repairs:d.repairStatus||'', notes:d.comments||'', defects:d.defects||'', materials:(d.materials&&d.materials.length)||0});
+  });
+  rows.sort((a,b)=> String(a.job).localeCompare(String(b.job)));
+  return rows;
+}
+function dueList(){
+  const canon=nameMap(), latest=new Map(), tod=parse(todayIso());
+  D.reports.forEach(r=>{
+    const k=[r.customer,r.crane_no,r.id_no].map(v=>String(v||'').trim().toLowerCase()).join('|')+'|'+(r.visit_type||'Service');
+    const p=latest.get(k);
+    if(!p || (r.report_date||'')>(p.report_date||'')) latest.set(k,r);
+  });
+  const out=[];
+  latest.forEach(r=>{
+    const lo=r.data&&r.data.loler, due = r.visit_type==='LOLER' ? ((lo&&lo.nextexam)||r.next_due) : r.next_due;
+    const dd=parse(due); if(!dd) return;
+    out.push({r, kind:r.visit_type||'Service', iso:iso(dd), days:Math.round((dd-tod)/864e5), eng:canon(r.engineer)});
+  });
+  out.sort((a,b)=>a.days-b.days); return out;
+}
+function repairsList(){
+  const canon=nameMap(), byEq=new Map(), cutoff=addDays(todayIso(),-30), open=[], done=[];
+  D.reports.forEach(r=>{ const k=[r.customer,r.crane_no,r.id_no].map(v=>String(v||'').trim().toLowerCase()).join('|'); if(!byEq.has(k)) byEq.set(k,[]); byEq.get(k).push(r); });
+  byEq.forEach(vs=>{
+    vs.sort((a,b)=>(a.report_date||'').localeCompare(b.report_date||''));
+    const latest=new Map();
+    vs.forEach(r=>{ ((r.data&&r.data.items)||[]).forEach(it=>{ if(it&&it.label&&it.status) latest.set(slug(it.group)+'__'+slug(it.label),{r,it}); }); });
+    latest.forEach(x=>{
+      if(x.it.status!=='URGENT' && x.it.status!=='ATTN') return;
+      const key=((x.r.data&&x.r.data.reportNo)||x.r.report_no||x.r.id)+'|'+slug(x.it.group)+'__'+slug(x.it.label);
+      const comp=D.comps[key];
+      const item={r:x.r,it:x.it,eng:canon(x.r.engineer),comp};
+      if(comp){ if((comp.done_date||'')>=cutoff) done.push(item); }
+      else if(!(x.it.work&&String(x.it.work).trim())) open.push(item);
+    });
+  });
+  open.sort((a,b)=>(a.it.status==='URGENT'?0:1)-(b.it.status==='URGENT'?0:1)||(a.r.report_date||'').localeCompare(b.r.report_date||''));
+  return {open,done};
+}
+
+// ---------- views ----------
+let invMode = false, weekStart = monday(todayIso()), dueWin = 30, dueEng = '', dueKind = '', tab = 'overview';
+
+function pill(days){ return days<0?`<span class="pill red">OVERDUE ${-days}d</span>`: days===0?'<span class="pill red">TODAY</span>': days<=7?`<span class="pill amber">${days}d</span>`:`<span class="pill grey">${days}d</span>`; }
+
+function viewOverview(){
+  const due=dueList(), rep=repairsList(), jobs=weekJobs(monday(todayIso()));
+  const over=due.filter(d=>d.days<0).length, due7=due.filter(d=>d.days>=0&&d.days<=7).length;
+  const soon=due.filter(d=>d.days>=0&&d.days<=30).length;
+  const urgent=rep.open.filter(x=>x.it.status==='URGENT').length;
+  const wkTotal=jobs.reduce((s,j)=>s+j.total,0);
+  const pending=D.pos.filter(p=>p.status==='pending').length;
+  const engs={}; due.filter(d=>d.days<=30).forEach(d=>{ (engs[d.eng]=engs[d.eng]||{o:0,s:0}); d.days<0?engs[d.eng].o++:engs[d.eng].s++; });
+  const today=new Date();
+  const greeting=today.getHours()<12?'Good morning':today.getHours()<17?'Good afternoon':'Good evening';
+  const alertTotal=over+due7+urgent+pending;
+  $('v-overview').innerHTML = `
+  <div class="control-hero">
+    <div class="eyebrow">Key Engineering · Operations</div>
+    <h2>${greeting}. Here's your control room.</h2>
+    <p>One place to keep an eye on jobs, inspections, repairs and purchase orders. Start with the priority alerts, then drill into the detail below.</p>
+    <div class="hero-bottom">
+      <button class="hero-light" id="heroDue">Review inspections due</button>
+      <button class="hero-dark" id="heroRepairs">View repairs queue</button>
+      <button class="hero-dark" id="heroWeek">Open weekly jobs</button>
+      <button class="hero-dark" id="heroPO">Purchase orders</button>
+    </div>
+  </div>
+  <div class="section-kicker">Priority alerts · ${alertTotal} items to check</div>
+  <div class="alert-grid">
+    <button class="alert-card ${over?'danger':'good'}" id="alertOverdue"><span class="alert-symbol">⚠</span><span><strong>${over}</strong><span>Overdue inspections</span></span></button>
+    <button class="alert-card ${due7?'warning':'good'}" id="alertDue7"><span class="alert-symbol">◷</span><span><strong>${due7}</strong><span>Due within 7 days</span></span></button>
+    <button class="alert-card ${urgent?'danger':'good'}" id="alertUrgent"><span class="alert-symbol">🔧</span><span><strong>${urgent}</strong><span>Urgent repairs</span></span></button>
+    <button class="alert-card ${pending?'warning':'good'}" id="alertPO"><span class="alert-symbol">▤</span><span><strong>${pending}</strong><span>POs awaiting approval</span></span></button>
+  </div>
+  <div class="tiles">
+    <div class="tile ${soon?'amber':''}"><b>${soon}</b><span>Due in next 30 days</span></div>
+    <div class="tile ${rep.open.length?'red':'green'}"><b>${rep.open.length}</b><span>Repairs outstanding</span></div>
+    <div class="tile"><b>${jobs.length}</b><span>Jobs this week</span></div>
+    <div class="tile"><b>${gbp(wkTotal)}</b><span>Estimated weekly labour + mileage + call-outs</span></div>
+    <div class="tile"><b>${D.reports.length}</b><span>Reports loaded</span></div>
+  </div>
+  <div class="overview-lower">
+    <div class="card"><h2>Upcoming by engineer <span class="mute small">Overdue + next 30 days</span></h2>
+    ${Object.keys(engs).length?`<div class="wrap"><table><thead><tr><th>Engineer</th><th class="r">Overdue</th><th class="r">Due in 30 days</th></tr></thead><tbody>${Object.keys(engs).sort().map(e=>`<tr><td>${esc(e)}</td><td class="r">${engs[e].o?`<span class="pill red">${engs[e].o}</span>`:'–'}</td><td class="r">${engs[e].s||'–'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">No due dates found in the loaded reports. Equipment only appears here when a report has a next-due date.</div>'}
+    </div>
+    <div class="card"><h2>Quick actions</h2>
+      <div class="mini-action-list">
+        <button class="mini-action" id="quickDue"><span class="mini-icon">📅</span><span><b>Inspection planner</b><small>Services, inspections and LOLER due dates</small></span></button>
+        <button class="mini-action" id="quickRepairs"><span class="mini-icon">🛠</span><span><b>Repairs queue</b><small>Outstanding and recently completed repairs</small></span></button>
+        <button class="mini-action" id="quickWeek"><span class="mini-icon">👷</span><span><b>Weekly engineer jobs</b><small>Hours, mileage and estimated totals</small></span></button>
+        <button class="mini-action" id="quickPO"><span class="mini-icon">🧾</span><span><b>Purchase orders</b><small>Review requests and approval status</small></span></button>
+      </div>
+      <p class="mute small" style="margin:12px 0 0">Last data refresh: ${D.loaded?D.loaded.toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}):'Not yet loaded'}</p>
+    </div>
+  </div>`;
+  const go = k => { tab=k; store.set('tab',tab); render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  [['heroDue','due'],['alertOverdue','due'],['alertDue7','due'],['quickDue','due'],
+   ['heroRepairs','repairs'],['alertUrgent','repairs'],['quickRepairs','repairs'],
+   ['heroWeek','week'],['quickWeek','week'],['heroPO','po'],['alertPO','po'],['quickPO','po']]
+   .forEach(([id,k])=>{const el=$(id); if(el) el.onclick=()=>{if(k==='due'){dueWin=id==='alertOverdue'?365:id==='alertDue7'?7:dueWin;} go(k);};});
+}
+async function saveMat(i){
+  const v=Math.max(0,num(i.value)); i.disabled=true;
+  try{
+    await api('/rest/v1/office_materials?on_conflict=job_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({job_id:i.dataset.job,amount:v})});
+    D.mats[i.dataset.job]=v;
+  }catch(e){ $('msg').innerHTML='<div class="err">Could not save materials: '+esc(e.message)+'</div>'; }
+  viewWeek();
+}
+function bindMats(){ document.querySelectorAll('#v-week input.mat').forEach(i=>i.onchange=()=>saveMat(i)); }
+const matInput = j => `<input class="mat" data-job="${esc(j.id)}" type="number" min="0" step="0.01" value="${j.mat||''}" placeholder="0.00" style="width:84px;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px">`;
+function dailyData(){
+  const due=dueList().filter(d=>d.days<=14), rep=repairsList(), canon=nameMap();
+  const dow=new Date().getDay(), since=addDays(todayIso(), dow===1?-3:-1);
+  return {
+    due,
+    urgent:rep.open.filter(x=>x.it.status==='URGENT'),
+    attn:rep.open.filter(x=>x.it.status!=='URGENT').length,
+    done:D.reports.filter(r=>(r.report_date||'')>=since&&(r.report_date||'')<todayIso()),
+    pend:D.pos.filter(p=>p.status==='pending'),
+    prog:D.jobs.filter(j=>(j.data||{}).status==='In Progress'),
+    since, canon
+  };
+}
+function viewToday(){
+  const d=dailyData(), t=new Date();
+  const dateLabel=t.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const over=d.due.filter(x=>x.days<0).length;
+  const sec=(title,count,body)=>`<div class="card"><h2>${title} <span class="mute small">${count}</span></h2><div class="wrap">${body}</div></div>`;
+  const none=m=>`<span class="mute">${m}</span>`;
+  const engs=[...new Set(d.due.map(x=>x.eng))].sort();
+  const dueBody=d.due.length?engs.map(e=>`<p style="font-weight:700;margin:12px 0 4px">${esc(e)}</p><table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th></tr>${d.due.filter(x=>x.eng===e).map(x=>`<tr><td>${uk(x.iso)}</td><td>${pill(x.days)}</td><td>${esc(x.kind)}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td></tr>`).join('')}</table>`).join(''):none('Nothing overdue or due in the next 14 days.');
+  const urgBody=d.urgent.length?`<table><tr><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${d.urgent.map(x=>`<tr><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`).join('')}</table>`+(d.attn?`<p class="small mute">Plus ${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:''):none('No urgent repairs outstanding.')+(d.attn?`<p class="small mute">${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:'');
+  const poBody=d.pend.length?`<table><tr><th>Engineer</th><th>Site / ref</th><th>Description</th><th class="r">Est.</th></tr>${d.pend.map(p=>`<tr><td>${esc(p.engineer_name)}</td><td>${esc(p.site_ref)}</td><td>${esc(p.description)}</td><td class="r">${esc(p.est_value||'')}</td></tr>`).join('')}</table>`:none('None waiting.');
+  const doneBody=d.done.length?`<table><tr><th>Date</th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Defects</th></tr>${d.done.map(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean),u=it.filter(i=>i.status==='URGENT').length,a=it.filter(i=>i.status==='ATTN').length;return `<tr><td>${uk(r.report_date)}</td><td>${esc(r.visit_type||'Service')}</td><td>${esc(r.customer)}</td><td>${esc(r.crane_no||'')}</td><td>${esc(d.canon(r.engineer))}</td><td>${u?`<span class="pill red">${u} urgent</span> `:''}${a?`<span class="pill amber">${a} attn</span>`:''}${u||a?'':'none'}</td></tr>`;}).join('')}</table>`:none('No services or inspections completed.');
+  const progBody=d.prog.length?`<table><tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Engineers</th></tr>${d.prog.map(j=>{const x=j.data;return `<tr><td>${esc(x.job||j.id)}</td><td>${esc(x.customerName||x.customer||'')}<div class="mute small">${esc(x.site||'')}</div></td><td>${esc(x.type||'')}</td><td>${esc((x.engineers||[]).map(d.canon).join(', '))}</td></tr>`;}).join('')}</table>`:none('No jobs in progress.');
+  $('v-today').innerHTML=`<div class="bar"><b>${esc(dateLabel)}</b><span class="mute small">${over} overdue · ${d.due.length-over} due in 14 days · ${d.urgent.length} urgent repairs · ${d.pend.length} POs waiting</span><span class="sp"></span><button class="primary" id="tCsv">Download today's list</button><button id="tPrint">Print</button></div>`+
+    sec('Services, inspections &amp; LOLER — overdue and next 14 days',d.due.length,dueBody)+
+    sec('Urgent repairs outstanding',d.urgent.length,urgBody)+
+    sec('Purchase orders awaiting approval',d.pend.length,poBody)+
+    sec('Completed since '+(new Date().getDay()===1?'Friday':'yesterday'),d.done.length,doneBody)+
+    sec('Bookings waiting to be issued',D.bookings.filter(b=>b.status==='booked').length,(()=>{const bk=D.bookings.filter(b=>b.status==='booked');return bk.length?`<table><tr><th>Customer / site</th><th>Job</th><th>Wanted</th><th>Priority</th></tr>${bk.map(b=>`<tr><td>${esc(b.customer)}<div class="mute small">${esc(b.site||'')}</div></td><td>${esc(b.job_type||'')}<div class="mute small">${esc(b.description)}</div></td><td>${b.wanted_date?uk(b.wanted_date):''}</td><td>${b.priority==='Urgent'?'<span class="pill red">URGENT</span>':'Normal'}</td></tr>`).join('')}</table>`:none('No bookings waiting.');})())+
+    sec('Jobs in progress',d.prog.length,progBody);
+  $('tPrint').onclick=()=>window.print();
+  $('tCsv').onclick=()=>{
+    const rows=[];
+    d.due.forEach(x=>rows.push(['Due / overdue',uk(x.iso),x.days<0?'OVERDUE '+(-x.days)+' days':x.days===0?'Today':'In '+x.days+' days',x.kind,x.r.customer,x.r.site,x.r.crane_no,x.eng,'']));
+    d.urgent.forEach(x=>rows.push(['Urgent repair',uk(x.r.report_date),'Urgent','',x.r.customer,x.r.site,x.r.crane_no,x.eng,(x.it.group||'')+' - '+x.it.label+(x.it.note?': '+x.it.note:'')]));
+    d.pend.forEach(p=>rows.push(['PO awaiting approval',uk((p.created_at||'').slice(0,10)),'Pending','','',p.site_ref,'',p.engineer_name,p.description+(p.est_value?' ('+p.est_value+')':'')]));
+    d.done.forEach(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean);rows.push(['Completed',uk(r.report_date),'Done',r.visit_type||'Service',r.customer,r.site,r.crane_no,d.canon(r.engineer),it.filter(i=>i.status==='URGENT').length+' urgent, '+it.filter(i=>i.status==='ATTN').length+' attn']);});
+    D.bookings.filter(b=>b.status==='booked').forEach(b=>rows.push(['Booking to issue',b.wanted_date?uk(b.wanted_date):'',b.priority,b.job_type||'',b.customer,b.site,'','',b.description]));
+    d.prog.forEach(j=>{const x=j.data;rows.push(['Job in progress',uk(x.date),'In progress',x.type,x.customerName||x.customer,x.site,'',(x.engineers||[]).map(d.canon).join(' + '),'Job '+(x.job||j.id)]);});
+    csvDownload('todays_list_'+todayIso()+'.csv',['Section','Date','Status','Type','Customer','Site','Crane','Engineer','Details'],rows);
+  };
+}
+const cap = n => String(n||'').replace(/^./,c=>c.toUpperCase());
+const JOB_TYPES = ['Service','Inspection','LOLER','Repair','Breakdown / call-out','Installation','Quote visit','Other'];
+async function patchBooking(id, fields){
+  await api('/rest/v1/bookings?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(fields)});
+}
+async function notifyEngineer(id){
+  const res=await fetch(SB.url+'/functions/v1/push-send',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+await token(),'Content-Type':'application/json'},body:JSON.stringify({action:'send',booking_id:id})});
+  const j=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(j.error||('Notification failed ('+res.status+')'));
+  return j;
+}
+function bookingText(b){
+  return ['New job from Key Engineering'+(b.priority==='Urgent'?' - URGENT':''),
+    b.customer, b.site||'', b.contact?('Contact: '+b.contact+(b.phone?' '+b.phone:'')):(b.phone?'Phone: '+b.phone:''),
+    (b.job_type||'')+(b.wanted_date?' - wanted '+uk(b.wanted_date):''), b.description].filter(Boolean).join('\n');
+}
+async function issueBooking(b, engId){
+  const person=D.people.find(x=>x.id===engId);
+  if(!person) throw new Error('Choose an engineer first');
+  await patchBooking(b.id,{engineer_id:engId,engineer_name:cap(person.name),status:'issued',issued_at:new Date().toISOString()});
+  let note='';
+  try{
+    const r=await notifyEngineer(b.id);
+    note = r.sent ? `Issued to ${cap(person.name)} and their phone has been notified.` : r.devices ? `Issued to ${cap(person.name)}, but the notification could not be delivered — use the Text button.` : `Issued to ${cap(person.name)}. They haven't switched on phone notifications yet — use the Text button.`;
+  }catch(e){ note=`Issued to ${cap(person.name)}, but the notification failed (${e.message}) — use the Text button.`; }
+  return note;
+}
+async function textEngineer(b){
+  let num=D.phones[b.engineer_id];
+  if(!num){
+    num=(window.prompt('Mobile number for '+(b.engineer_name||'this engineer')+':')||'').replace(/[^0-9+]/g,'');
+    if(!num) return;
+    await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:b.engineer_id,phone:num})});
+    D.phones[b.engineer_id]=num;
+  }
+  window.location.href='sms:'+num+'?&body='+encodeURIComponent(bookingText(b));
+}
+function viewBookings(){
+  const people=D.people, opt=(sel)=>people.map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc(cap(x.name))}</option>`).join('');
+  const open=D.bookings.filter(b=>b.status==='booked');
+  const out=D.bookings.filter(b=>b.status==='issued'||b.status==='accepted');
+  const cutoff=addDays(todayIso(),-7);
+  const done=D.bookings.filter(b=>b.status==='done'&&(b.done_at||'').slice(0,10)>=cutoff);
+  const card=(b,mode)=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between"><b>${esc(b.customer)}</b><span>${b.priority==='Urgent'?'<span class="pill red">URGENT</span> ':''}<span class="pill ${b.status==='done'?'green':b.status==='accepted'?'green':b.status==='issued'?'amber':'grey'}">${esc(b.status)}</span></span></div>
+    <div class="mute small">${esc([b.site,b.job_type,b.wanted_date?'wanted '+uk(b.wanted_date):''].filter(Boolean).join(' · '))}</div>
+    <div class="small" style="margin:6px 0">${esc(b.description)}</div>
+    <div class="mute small">${b.contact||b.phone?'Contact: '+esc([b.contact,b.phone].filter(Boolean).join(' · '))+' · ':''}Booked ${uk((b.created_at||'').slice(0,10))}${b.engineer_name?' · Engineer: '+esc(b.engineer_name):''}${b.accepted_at?' · Accepted '+uk(b.accepted_at.slice(0,10)):''}</div>
+    <div class="bar" style="margin:10px 0 0;padding:8px;box-shadow:none">
+    ${mode==='open'?`<select data-eng="${esc(b.id)}"><option value="">Choose engineer…</option>${opt(b.engineer_id)}</select><button class="primary" data-act="issue" data-id="${esc(b.id)}">Issue</button>`:''}
+    ${mode==='out'?`<button data-act="text" data-id="${esc(b.id)}">Text</button><button data-act="notify" data-id="${esc(b.id)}">Notify again</button><button data-act="done" data-id="${esc(b.id)}">Mark done</button>`:''}
+    ${mode==='done'?`<button data-act="text" data-id="${esc(b.id)}">Text</button>`:''}
+    <span class="sp"></span>${mode!=='done'?`<button data-act="cancel" data-id="${esc(b.id)}">Cancel booking</button>`:''}</div></div>`;
+  $('v-bookings').innerHTML=`<div class="card"><h2>New booking <span class="mute small">customer rings the office</span></h2>
+    <form id="bkForm"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <label class="small">Customer *<input name="customer" required class="fld"></label>
+      <label class="small">Site / address<input name="site" class="fld"></label>
+      <label class="small">Contact name<input name="contact" class="fld"></label>
+      <label class="small">Contact phone<input name="phone" type="tel" class="fld"></label>
+      <label class="small">Type of job<select name="job_type" class="fld">${JOB_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></label>
+      <label class="small">Priority<select name="priority" class="fld"><option>Normal</option><option>Urgent</option></select></label>
+      <label class="small">Date wanted<input name="wanted_date" type="date" class="fld"></label>
+      <label class="small">Engineer (optional)<select name="engineer" class="fld"><option value="">Decide later</option>${opt('')}</select></label>
+    </div>
+    <label class="small" style="display:block;margin-top:10px">What needs doing *<textarea name="description" required rows="3" class="fld" style="width:100%"></textarea></label>
+    <div class="bar" style="margin:12px 0 0;padding:0;border:0;box-shadow:none"><button class="primary" type="submit" data-issue="0">Save booking</button><button type="submit" data-issue="1">Save &amp; issue to engineer</button><span class="mute small" id="bkMsg"></span></div></form></div>
+    <div class="card"><h2>Waiting to be issued <span class="mute small">${open.length}</span></h2>${open.length?open.map(b=>card(b,'open')).join(''):'<span class="mute">No bookings waiting.</span>'}</div>
+    <div class="card"><h2>Out with engineers <span class="mute small">${out.length}</span></h2>${out.length?out.map(b=>card(b,'out')).join(''):'<span class="mute">Nothing issued at the moment.</span>'}</div>
+    <div class="card"><h2>Done in the last 7 days <span class="mute small">${done.length}</span></h2>${done.length?done.map(b=>card(b,'done')).join(''):'<span class="mute">None.</span>'}</div>
+    <div class="card"><details><summary>Engineer mobile numbers (for the Text button)</summary><div class="wrap" style="margin-top:10px"><table>${people.map(x=>`<tr><td>${esc(cap(x.name))}</td><td><input class="fld" data-phone="${esc(x.id)}" type="tel" value="${esc(D.phones[x.id]||'')}" placeholder="07…"></td></tr>`).join('')}</table></div></details></div>`;
+  document.querySelectorAll('#v-bookings .fld').forEach(el=>{el.style.cssText+=';width:100%;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;box-sizing:border-box';});
+  const say=(m,err)=>{$('msg').innerHTML=`<div class="${err?'err':'note'}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:'smooth'});};
+  let wantIssue=false;
+  $('bkForm').querySelectorAll('button[type=submit]').forEach(b=>b.onclick=()=>{wantIssue=b.dataset.issue==='1';});
+  $('bkForm').onsubmit=async e=>{
+    e.preventDefault();
+    const f=new FormData($('bkForm')), v=k=>String(f.get(k)||'').trim();
+    const eng=v('engineer');
+    if(wantIssue&&!eng){ say('Choose an engineer to issue it to, or use Save booking.',true); return; }
+    $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=true);
+    try{
+      const res=await api('/rest/v1/bookings',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({customer:v('customer'),site:v('site')||null,contact:v('contact')||null,phone:v('phone')||null,job_type:v('job_type'),priority:v('priority'),wanted_date:v('wanted_date')||null,description:v('description')})});
+      const made=(await res.json())[0];
+      let msg='Booking saved.';
+      if(wantIssue&&made) msg=await issueBooking(made,eng);
+      else if(eng&&made){ const pe=D.people.find(x=>x.id===eng); await patchBooking(made.id,{engineer_id:eng,engineer_name:cap(pe&&pe.name)}); }
+      await load(); render(); say(msg,false);
+    }catch(err){ say('Could not save: '+err.message,true); $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=false); }
+  };
+  $('v-bookings').querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{
+    const b=D.bookings.find(x=>x.id===btn.dataset.id); if(!b) return;
+    btn.disabled=true;
+    try{
+      const act=btn.dataset.act;
+      if(act==='issue'){ const eng=document.querySelector(`select[data-eng="${b.id}"]`).value; const msg=await issueBooking(b,eng); await load(); render(); say(msg,false); return; }
+      if(act==='text'){ await textEngineer(b); btn.disabled=false; render(); return; }
+      if(act==='notify'){ const r=await notifyEngineer(b.id); say(r.sent?'Notification sent.':r.devices?'The notification could not be delivered — use the Text button.':'That engineer has not switched on phone notifications yet — use the Text button.',!r.sent); btn.disabled=false; return; }
+      if(act==='done'){ await patchBooking(b.id,{status:'done',done_at:new Date().toISOString()}); }
+      if(act==='cancel'){ if(!confirm('Cancel this booking?')){btn.disabled=false;return;} await patchBooking(b.id,{status:'cancelled'}); }
+      await load(); render();
+    }catch(err){ say(err.message,true); btn.disabled=false; }
+  });
+  $('v-bookings').querySelectorAll('input[data-phone]').forEach(i=>i.onchange=async()=>{
+    const num=i.value.replace(/[^0-9+]/g,'');
+    try{ await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:i.dataset.phone,phone:num})}); D.phones[i.dataset.phone]=num; i.value=num; say('Number saved.',false); }
+    catch(err){ say('Could not save number: '+err.message,true); }
+  });
+}
+function viewWeek(){ if(invMode) viewInvoice(); else viewWeekEngineers(); }
+function hrsText(j){ return [j.nt?j.nt+' normal':'',j.ot?j.ot+' OT1':'',j.dt?j.dt+' OT2':''].filter(Boolean).join(', ')+(j.n>1?' × '+j.n+' engineers':''); }
+function viewInvoice(){
+  const rows=weekJobs(weekStart), by={};
+  rows.forEach(j=>{ const c=j.customer||'Customer not set'; (by[c]=by[c]||[]).push(j); });
+  const tot=rows.reduce((s,j)=>s+j.total,0);
+  let html=`<div class="bar"><button id="iPrev">◀</button><b>Invoice worksheet · week starting ${uk(weekStart)}</b><button id="iNext">▶</button><button id="iNow">This week</button><span class="sp"></span><button id="iBack">Back to engineers</button><button id="iPrint">Print</button></div>
+  <div class="note">One line per job. Labour = hours × rate × number of engineers; mileage once per job. Type materials into each job — they are saved for the whole office.</div>
+  <div class="tiles"><div class="tile"><b>${Object.keys(by).length}</b><span>Customers to invoice</span></div><div class="tile"><b>${gbp(tot)}</b><span>Total to invoice</span></div></div>`;
+  if(!rows.length) html+='<div class="card mute">No job sheets with time booked in this week.</div>';
+  Object.keys(by).sort().forEach(c=>{
+    const js=by[c], ct=js.reduce((s,j)=>s+j.total,0);
+    html+=`<div class="card"><h2>${esc(c)} <span>${gbp(ct)}</span></h2><div class="wrap"><table>
+    <tr><th>Job</th><th>Site / type</th><th>Engineers</th><th>Work carried out</th><th class="r">Labour</th><th class="r">Mileage</th><th class="r">Call-out</th><th class="r">Materials £</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.site)}<div class="mute small">${esc(j.type)}</div></td><td>${esc(j.engs.join(', '))}</td><td style="white-space:pre-wrap;min-width:200px;max-width:340px">${esc(j.notes)}${j.defects?`<div class="mute small">Follow-up: ${esc(j.defects)}</div>`:''}</td><td class="r">${gbp(j.labour)}<div class="mute small">${esc(hrsText(j))}</div></td><td class="r">${gbp(j.mileage)}<div class="mute small">${j.mile?j.mile+' miles':''}</div></td><td class="r">${j.call?gbp(j.call):''}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    </table></div></div>`;
+  });
+  $('v-week').innerHTML=html;
+  $('iPrev').onclick=()=>{weekStart=addDays(weekStart,-7);viewWeek();};
+  $('iNext').onclick=()=>{weekStart=addDays(weekStart,7);viewWeek();};
+  $('iNow').onclick=()=>{weekStart=monday(todayIso());viewWeek();};
+  $('iBack').onclick=()=>{invMode=false;viewWeek();};
+  $('iPrint').onclick=()=>window.print();
+  bindMats();
+}
+function viewWeekEngineers(){
+  const rows=weekJobs(weekStart), by={};
+  rows.forEach(j=> j.engs.forEach(e=>{ (by[e]=by[e]||[]).push(j); }));
+  const tot=rows.reduce((s,j)=>s+j.total,0);
+  let html=`<div class="bar"><button id="wPrev">◀</button><b>Week starting ${uk(weekStart)}</b> <span class="mute small">to ${uk(addDays(weekStart,6))}</span><button id="wNext">▶</button><button id="wNow">This week</button><span class="sp"></span><button id="wCsv" ${rows.length?'':'disabled'}>Download CSV</button><button id="wInv" class="primary">Invoice worksheet</button><button id="wPrint">Print</button></div>
+  <div class="note">Costed at normal £50, OT1 £64, OT2 £73 per hour (× number of engineers named), £100 call-out, £0.70/mile. Type materials into the box on each job; they are saved for the whole office. Mileage is counted once per job, not per engineer.</div>
+  <div class="tiles"><div class="tile"><b>${rows.length}</b><span>Jobs</span></div><div class="tile"><b>${gbp(tot)}</b><span>Labour + mileage + call-outs + materials</span></div><div class="tile"><b>${Object.keys(by).length}</b><span>Engineers working</span></div></div>`;
+  if(!rows.length) html+='<div class="card mute">No job sheets with time booked in this week.</div>';
+  Object.keys(by).sort().forEach(e=>{
+    const js=by[e];
+    html+=`<div class="card"><h2>${esc(e)} <span class="mute small">${js.length} job${js.length===1?'':'s'}</span></h2><div class="wrap"><table>
+    <tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Status</th><th class="r">Normal</th><th class="r">OT1</th><th class="r">OT2</th><th class="r">Miles</th><th class="r">Crew</th><th class="r">Materials £</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.customer)}<div class="mute small">${esc(j.site)}</div></td><td>${esc(j.type)}</td><td><span class="pill ${j.status==='Complete'?'green':'amber'}">${esc(j.status||'–')}</span>${j.repairs&&j.repairs!=='Done'?`<div class="small mute">Repairs: ${esc(j.repairs)}</div>`:''}</td><td class="r">${j.nt||''}</td><td class="r">${j.ot||''}</td><td class="r">${j.dt||''}</td><td class="r">${j.mile||''}</td><td class="r">${j.n}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    </table></div></div>`;
+  });
+  $('v-week').innerHTML=html;
+  $('wPrev').onclick=()=>{weekStart=addDays(weekStart,-7);viewWeek();};
+  $('wNext').onclick=()=>{weekStart=addDays(weekStart,7);viewWeek();};
+  $('wNow').onclick=()=>{weekStart=monday(todayIso());viewWeek();};
+  $('wPrint').onclick=()=>window.print();
+  $('wInv').onclick=()=>{invMode=true;viewWeek();};
+  bindMats();
+  $('wCsv').onclick=()=>{
+    const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const lines=[['Engineers','Job','Customer','Site','Type','Status','Normal hrs','OT1 hrs','OT2 hrs','Crew','Miles','Labour','Mileage','Call-out','Materials','Total'].map(q).join(',')];
+    rows.forEach(j=>[j.engs.join(' + ')].forEach(e=>lines.push([e,j.job,j.customer,j.site,j.type,j.status,j.nt,j.ot,j.dt,j.n,j.mile,j.labour.toFixed(2),j.mileage.toFixed(2),j.call.toFixed(2),j.mat.toFixed(2),j.total.toFixed(2)].map(q).join(','))));
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines.join('\r\n')],{type:'text/csv'})); a.download='jobs_week_'+weekStart+'.csv'; a.click();
+  };
+}
+
+function viewDue(){
+  const all=dueList(), engs=[...new Set(all.map(d=>d.eng))].sort();
+  const list=all.filter(d=>d.days<=dueWin && (!dueEng||d.eng===dueEng) && (!dueKind||d.kind===dueKind));
+  $('v-due').innerHTML=`<div class="bar">
+    <select id="dEng"><option value="">All engineers</option>${engs.map(e=>`<option ${e===dueEng?'selected':''}>${esc(e)}</option>`).join('')}</select>
+    <select id="dKind"><option value="">Service / Inspection / LOLER</option>${Object.keys(KINDS).map(k=>`<option ${k===dueKind?'selected':''}>${k}</option>`).join('')}</select>
+    <select id="dWin">${[7,30,60,90,365].map(n=>`<option value="${n}" ${n===dueWin?'selected':''}>Next ${n} days</option>`).join('')}</select>
+    <span class="mute small">${list.length} shown</span><span class="sp"></span><button id="dCsv" ${list.length?'':'disabled'}>Download CSV</button></div>
+    <div class="card wrap">${list.length?`<table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Last visit</th></tr>
+    ${list.map(d=>`<tr><td>${uk(d.iso)}</td><td>${pill(d.days)}</td><td>${esc(d.kind)}</td><td>${esc(d.r.customer)}<div class="mute small">${esc(d.r.site||'')}</div></td><td>${esc(d.r.crane_no||'')}${d.r.id_no?` <span class="mute small">ID ${esc(d.r.id_no)}</span>`:''}</td><td>${esc(d.eng)}</td><td>${uk(d.r.report_date)}</td></tr>`).join('')}</table>`:'<span class="mute">Nothing due in this window.</span>'}</div>`;
+  $('dCsv').onclick=()=>csvDownload('due_'+todayIso()+'.csv',['Due','Days','Type','Customer','Site','Crane','ID','Engineer','Last visit'],list.map(d=>[uk(d.iso),d.days,d.kind,d.r.customer,d.r.site,d.r.crane_no,d.r.id_no,d.eng,uk(d.r.report_date)]));
+  $('dEng').onchange=e=>{dueEng=e.target.value;viewDue();};
+  $('dKind').onchange=e=>{dueKind=e.target.value;viewDue();};
+  $('dWin').onchange=e=>{dueWin=+e.target.value;viewDue();};
+}
+
+function viewRepairs(){
+  const {open,done}=repairsList();
+  const row=x=>`<tr><td>${x.it.status==='URGENT'?'<span class="pill red">URGENT</span>':'<span class="pill amber">REQ ATTN</span>'}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`;
+  $('v-repairs').innerHTML=`<div class="bar"><span class="mute small">Repairs to book in with customers</span><span class="sp"></span><button id="rCsv" ${open.length?'':'disabled'}>Download CSV</button><button id="rPrint">Print</button></div><div class="card"><h2>Repairs required <span class="mute small">${open.length} to book in</span></h2><div class="wrap">${open.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${open.map(row).join('')}</table>`:'<span class="mute">No outstanding repairs.</span>'}</div></div>
+  <div class="card"><h2>Repaired in last 30 days <span class="mute small">${done.length}</span></h2><div class="wrap">${done.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${done.map(row).join('')}</table>`:'<span class="mute">None recorded.</span>'}</div></div>`;
+  $('rCsv').onclick=()=>csvDownload('repairs_'+todayIso()+'.csv',['Priority','Customer','Site','Crane','Group','Item','Note','Engineer','Reported'],open.map(x=>[x.it.status==='URGENT'?'Urgent':'Req attn',x.r.customer,x.r.site,x.r.crane_no,x.it.group,x.it.label,x.it.note,x.eng,uk(x.r.report_date)]));
+  $('rPrint').onclick=()=>window.print();
+}
+
+function viewPo(){
+  const admin = D.pos.some(p=>p.requested_by!==(store.get('session')||{}).uid);
+  $('v-po').innerHTML=`<div class="card"><h2>Purchase orders <span class="mute small">${D.pos.length}</span></h2><div class="wrap">${D.pos.length?`<table><tr><th>Status</th><th>PO</th><th>Engineer</th><th>Site / ref</th><th>Description</th><th class="r">Est.</th><th>Requested</th><th></th></tr>
+  ${D.pos.map(p=>`<tr><td><span class="pill ${p.status==='approved'?'green':p.status==='rejected'?'red':'amber'}">${esc(p.status)}</span></td><td>${esc(p.po_number||'')}</td><td>${esc(p.engineer_name)}</td><td>${esc(p.site_ref)}</td><td>${esc(p.description)}</td><td class="r">${esc(p.est_value||'')}</td><td>${uk((p.created_at||'').slice(0,10))}</td><td>${p.status==='pending'&&admin?`<button data-a="approve_po" data-id="${esc(p.id)}">Approve</button> <button data-a="reject_po" data-id="${esc(p.id)}">Reject</button>`:''}</td></tr>`).join('')}</table>`:'<span class="mute">No purchase order requests.</span>'}</div></div>`;
+  $('v-po').querySelectorAll('button[data-a]').forEach(b=>b.onclick=async()=>{
+    b.disabled=true;
+    try{ await api('/rest/v1/rpc/'+b.dataset.a,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_id:b.dataset.id})}); await refresh(); }
+    catch(e){ $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; b.disabled=false; }
+  });
+}
+
+// ---------- global command-room search ----------
+function runGlobalSearch(){
+  const input=$('globalSearch'), box=$('searchResults');
+  if(!input||!box) return;
+  const q=input.value.trim().toLowerCase();
+  if(!q){box.classList.add('hide');box.innerHTML='';return;}
+  const hits=[];
+  const has=v=>String(v==null?'':v).toLowerCase().includes(q);
+  D.jobs.forEach(j=>{
+    const d=j.data||{};
+    const hay=[d.job,j.id,d.customerName,d.customer,d.site,d.type,d.status,...(d.engineers||[])].join(' ');
+    if(has(hay)) hits.push({type:'Job sheet',main:(d.job||j.id)+' · '+(d.customerName||d.customer||'Customer not set'),sub:[d.site,d.type,d.status].filter(Boolean).join(' · '),tab:'week',key:j.id,week:((d.time||[])[0]||{}).date||d.date||''});
+  });
+  D.reports.forEach(r=>{
+    const hay=[r.report_no,r.customer,r.crane_no,r.id_no,r.visit_type,r.engineer,r.site,r.report_date].join(' ');
+    if(has(hay)) hits.push({type:'Service / LOLER report',main:(r.report_no||'Report')+' · '+(r.customer||'Customer not set'),sub:[r.visit_type,r.crane_no?'Crane '+r.crane_no:'',r.site,uk(r.report_date)].filter(Boolean).join(' · '),tab:'due',key:r.id});
+  });
+  D.pos.forEach(p=>{
+    const hay=[p.po_number,p.engineer_name,p.site_ref,p.description,p.status,p.requested_by].join(' ');
+    if(has(hay)) hits.push({type:'Purchase order',main:(p.po_number||'PO request')+' · '+(p.site_ref||p.engineer_name||'Request'),sub:[p.status,p.description].filter(Boolean).join(' · '),tab:'po',key:p.id});
+  });
+  D.bookings.forEach(b=>{
+    const hay=[b.customer,b.site,b.contact,b.phone,b.description,b.job_type,b.engineer_name,b.status].join(' ');
+    if(has(hay)) hits.push({type:'Booking',main:(b.customer||'Booking')+' · '+(b.site||''),sub:[b.status,b.job_type,b.engineer_name].filter(Boolean).join(' · '),tab:'bookings',key:b.id});
+  });
+  const limited=hits.slice(0,30);
+  box.innerHTML=`<div class="result-head">${hits.length} matching record${hits.length===1?'':'s'}${hits.length>30?' · showing first 30':''}</div>`+
+    (limited.length?limited.map((h,i)=>`<div class="result" role="button" tabindex="0" data-hit="${i}"><div class="result-type">${esc(h.type)}</div><div><div class="result-main">${esc(h.main)}</div><div class="result-sub">${esc(h.sub)}</div></div><div class="result-go">Open section →</div></div>`).join(''):`<div class="empty-state">No matching records in the data currently loaded. Try a customer name, crane number, job number or PO reference.</div>`);
+  box.classList.remove('hide');
+  box.querySelectorAll('[data-hit]').forEach(el=>{
+    const open=()=>{const h=limited[+el.dataset.hit];if(h.tab==='week'&&h.week)weekStart=monday(h.week);tab=h.tab;store.set('tab',tab);render();box.classList.add('hide');input.blur();};
+    el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+  });
+}
+
+// ---------- shell ----------
+const TABS=[['overview','Overview'],['today','Today'],['bookings','Bookings'],['week','Week by engineer'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders']];
+function render(){
+  const due=dueList(), rep=repairsList();
+  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length, bookings:D.bookings.filter(b=>b.status==='booked').length};
+  $('tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${badge[k]?`<span class="n ${k==='due'?'hot':''}">${badge[k]}</span>`:''}</button>`).join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;store.set('tab',tab);render();});
+  TABS.forEach(([k])=>$('v-'+k).classList.toggle('hide',k!==tab));
+  ({overview:viewOverview,today:viewToday,bookings:viewBookings,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo})[tab]();
+}
+async function refresh(){ $('refresh').disabled=true; try{ await load(); render(); }catch(e){ if(!store.get('session')) showLogin(e.message); else $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; } finally{ $('refresh').disabled=false; } }
+function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').className='err'+(m?'':' hide'); $('loginErr').textContent=m||''; }
+async function showApp(){ $('login').classList.add('hide'); $('app').classList.remove('hide'); const s=store.get('session')||{}; $('who').textContent=s.email||''; tab=store.get('tab')||'overview'; if(!TABS.some(t=>t[0]===tab)) tab='overview'; await refresh(); }
+
+$('go').onclick=async()=>{
+  $('go').disabled=true;
+  try{
+    const res=await fetch(SB.url+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:$('em').value.trim(),password:$('pw').value})});
+    const j=await res.json().catch(()=>({}));
+    if(!res.ok){ const m=j.error_description||j.msg||j.message||''; throw new Error(/invalid/i.test(m)?"That email or password isn't right. Use your full email address.":(m||'Sign-in failed ('+res.status+')')); }
+    saveSession(j); $('pw').value=''; await showApp();
+  }catch(e){ showLogin(e.name==='TypeError'?'No connection — check your signal and try again.':e.message); }
+  $('go').disabled=false;
+};
+$('forgot').onclick=async()=>{
+  const em=$('em').value.trim(), box=$('loginErr');
+  if(!em){ showLogin('Type your email address above first, then tap Forgot password.'); return; }
+  try{
+    const res=await fetch(SB.url+'/auth/v1/recover',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:em})});
+    if(res.ok){ box.className='note'; box.textContent='If that email has an account, a reset link is on its way. Open it on this device.'; }
+    else showLogin('Could not send the reset email ('+res.status+').');
+  }catch(e){ showLogin('No connection — check your signal and try again.'); }
+};
+$('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') $('go').click(); });
+$('out').onclick=()=>{ store.del('session'); showLogin(''); };
+$('refresh').onclick=refresh;
+$('globalSearch').addEventListener('input',runGlobalSearch);
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Escape'){$('globalSearch').value='';runGlobalSearch();}});
+$('controlStatus').textContent='Signed-in session · last refresh shown on dashboard';
+setInterval(()=>{ if(store.get('session') && !document.hidden) refresh(); }, 5*60*1000);
+if(store.get('session')) showApp(); else showLogin('');
+</script>
+</body>
+</html>
