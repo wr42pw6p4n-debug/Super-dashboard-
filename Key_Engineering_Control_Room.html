@@ -131,7 +131,7 @@ details summary{cursor:pointer;color:var(--accent-dark);font-weight:700}
 }
 @media(max-width:390px){.tiles{grid-template-columns:1fr 1fr}.tile b{font-size:24px}header h1{min-width:100%}}
 @media print{
- header,nav,.bar button,#refresh,#out{display:none!important}
+ header,nav,.bar button,#refresh,#out,.commandbar,.search-results{display:none!important}
  body{background:#fff;color:#111}
  main{max-width:none;padding:0}
  .card,.tile{box-shadow:none;break-inside:avoid;border-color:#bbb}
@@ -174,6 +174,8 @@ details summary{cursor:pointer;color:var(--accent-dark);font-weight:700}
     <div id="searchResults" class="search-results hide"></div>
     <div id="msg"></div>
     <section id="v-overview"></section>
+    <section id="v-today" class="hide"></section>
+    <section id="v-bookings" class="hide"></section>
     <section id="v-week" class="hide"></section>
     <section id="v-due" class="hide"></section>
     <section id="v-repairs" class="hide"></section>
@@ -235,23 +237,26 @@ async function getAll(table, query){
   } return out;
 }
 
-let D = {mats:{}, jobs:[], reports:[], comps:{}, pos:[], profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
+let D = {bookings:[], people:[], phones:{}, mats:{}, jobs:[], reports:[], comps:{}, pos:[], profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
 
 async function load(){
   $('msg').innerHTML='';
   const problems=[];
-  const [jobs, reports, comps, pos, prof, mats] = await Promise.all([
+  const [jobs, reports, comps, pos, prof, mats, bks, people, phones] = await Promise.all([
     getAll('js_docs','select=id,data,updated_at&kind=eq.job&deleted=eq.false').catch(e=>{problems.push('Job sheets: '+e.message); return null;}),
     getAll('reports','select=id,report_no,customer,crane_no,id_no,visit_type,report_date,engineer,next_due,site,data,updated_at&order=report_date.desc').catch(e=>{problems.push('Reports: '+e.message); return [];}),
     getAll('completions','select=key,done_date,note').catch(e=>{problems.push('Completions: '+e.message); return [];}),
     getAll('po_requests','select=*&order=created_at.desc').catch(e=>{problems.push('Purchase orders: '+e.message); return [];}),
     api('/rest/v1/profiles?select=name,role&id=eq.'+encodeURIComponent((store.get('session')||{}).uid||'')).then(r=>r.json()).catch(()=>[]),
-    getAll('office_materials','select=job_id,amount').catch(e=>{problems.push('Materials: '+e.message); return [];})
+    getAll('office_materials','select=job_id,amount').catch(e=>{problems.push('Materials: '+e.message); return [];}),
+    getAll('bookings','select=*&order=created_at.desc').catch(e=>{problems.push('Bookings: '+e.message); return [];}),
+    getAll('profiles','select=id,name,role&order=name.asc').catch(()=>[]),
+    getAll('engineer_phones','select=user_id,phone').catch(()=>[])
   ]);
   D.jobsBlocked = jobs === null; D.jobs = jobs || [];
   D.reports = reports; D.profile = prof[0]||null;
   D.comps = {}; comps.forEach(c=>D.comps[c.key]=c);
-  D.pos = pos; D.mats = {}; mats.forEach(m=>D.mats[m.job_id]=num(m.amount)); D.loaded = new Date();
+  D.pos = pos; D.bookings = bks; D.people = people; D.phones = {}; phones.forEach(x=>D.phones[x.user_id]=x.phone); D.mats = {}; mats.forEach(m=>D.mats[m.job_id]=num(m.amount)); D.loaded = new Date();
   if(problems.length) $('msg').innerHTML = '<div class="err">'+problems.map(esc).join('<br>')+'</div>';
   if(D.jobsBlocked) $('msg').innerHTML += '<div class="note">This login can\'t see job sheets. Add the office user to the Job Manager members list in Supabase (table <b>js_members</b>).</div>';
   $('synced').textContent = 'Updated '+D.loaded.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -283,7 +288,7 @@ function weekJobs(start){
     const labour = (nt*RATES.nt + ot*RATES.ot + dt*RATES.dt)*n, mileage = mile*RATES.mile, call = hasCallout?RATES.callout:0, mat = D.mats[j.id]||0;
     rows.push({id:j.id, job:d.job||j.id, customer:d.customerName||d.customer||'', site:d.site||'', type:d.type||'', status:d.status||'',
       engs: engs.length?engs:['Unassigned'], n, nt,ot,dt,mile, labour, mileage, call, mat, total:labour+mileage+call+mat,
-      repairs:d.repairStatus||'', materials:(d.materials&&d.materials.length)||0});
+      repairs:d.repairStatus||'', notes:d.comments||'', defects:d.defects||'', materials:(d.materials&&d.materials.length)||0});
   });
   rows.sort((a,b)=> String(a.job).localeCompare(String(b.job)));
   return rows;
@@ -395,6 +400,158 @@ async function saveMat(i){
 }
 function bindMats(){ document.querySelectorAll('#v-week input.mat').forEach(i=>i.onchange=()=>saveMat(i)); }
 const matInput = j => `<input class="mat" data-job="${esc(j.id)}" type="number" min="0" step="0.01" value="${j.mat||''}" placeholder="0.00" style="width:84px;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px">`;
+function dailyData(){
+  const due=dueList().filter(d=>d.days<=14), rep=repairsList(), canon=nameMap();
+  const dow=new Date().getDay(), since=addDays(todayIso(), dow===1?-3:-1);
+  return {
+    due,
+    urgent:rep.open.filter(x=>x.it.status==='URGENT'),
+    attn:rep.open.filter(x=>x.it.status!=='URGENT').length,
+    done:D.reports.filter(r=>(r.report_date||'')>=since&&(r.report_date||'')<todayIso()),
+    pend:D.pos.filter(p=>p.status==='pending'),
+    prog:D.jobs.filter(j=>(j.data||{}).status==='In Progress'),
+    since, canon
+  };
+}
+function viewToday(){
+  const d=dailyData(), t=new Date();
+  const dateLabel=t.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const over=d.due.filter(x=>x.days<0).length;
+  const sec=(title,count,body)=>`<div class="card"><h2>${title} <span class="mute small">${count}</span></h2><div class="wrap">${body}</div></div>`;
+  const none=m=>`<span class="mute">${m}</span>`;
+  const engs=[...new Set(d.due.map(x=>x.eng))].sort();
+  const dueBody=d.due.length?engs.map(e=>`<p style="font-weight:700;margin:12px 0 4px">${esc(e)}</p><table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th></tr>${d.due.filter(x=>x.eng===e).map(x=>`<tr><td>${uk(x.iso)}</td><td>${pill(x.days)}</td><td>${esc(x.kind)}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td></tr>`).join('')}</table>`).join(''):none('Nothing overdue or due in the next 14 days.');
+  const urgBody=d.urgent.length?`<table><tr><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${d.urgent.map(x=>`<tr><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`).join('')}</table>`+(d.attn?`<p class="small mute">Plus ${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:''):none('No urgent repairs outstanding.')+(d.attn?`<p class="small mute">${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:'');
+  const poBody=d.pend.length?`<table><tr><th>Engineer</th><th>Site / ref</th><th>Description</th><th class="r">Est.</th></tr>${d.pend.map(p=>`<tr><td>${esc(p.engineer_name)}</td><td>${esc(p.site_ref)}</td><td>${esc(p.description)}</td><td class="r">${esc(p.est_value||'')}</td></tr>`).join('')}</table>`:none('None waiting.');
+  const doneBody=d.done.length?`<table><tr><th>Date</th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Defects</th></tr>${d.done.map(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean),u=it.filter(i=>i.status==='URGENT').length,a=it.filter(i=>i.status==='ATTN').length;return `<tr><td>${uk(r.report_date)}</td><td>${esc(r.visit_type||'Service')}</td><td>${esc(r.customer)}</td><td>${esc(r.crane_no||'')}</td><td>${esc(d.canon(r.engineer))}</td><td>${u?`<span class="pill red">${u} urgent</span> `:''}${a?`<span class="pill amber">${a} attn</span>`:''}${u||a?'':'none'}</td></tr>`;}).join('')}</table>`:none('No services or inspections completed.');
+  const progBody=d.prog.length?`<table><tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Engineers</th></tr>${d.prog.map(j=>{const x=j.data;return `<tr><td>${esc(x.job||j.id)}</td><td>${esc(x.customerName||x.customer||'')}<div class="mute small">${esc(x.site||'')}</div></td><td>${esc(x.type||'')}</td><td>${esc((x.engineers||[]).map(d.canon).join(', '))}</td></tr>`;}).join('')}</table>`:none('No jobs in progress.');
+  $('v-today').innerHTML=`<div class="bar"><b>${esc(dateLabel)}</b><span class="mute small">${over} overdue · ${d.due.length-over} due in 14 days · ${d.urgent.length} urgent repairs · ${d.pend.length} POs waiting</span><span class="sp"></span><button class="primary" id="tCsv">Download today's list</button><button id="tPrint">Print</button></div>`+
+    sec('Services, inspections &amp; LOLER — overdue and next 14 days',d.due.length,dueBody)+
+    sec('Urgent repairs outstanding',d.urgent.length,urgBody)+
+    sec('Purchase orders awaiting approval',d.pend.length,poBody)+
+    sec('Completed since '+(new Date().getDay()===1?'Friday':'yesterday'),d.done.length,doneBody)+
+    sec('Bookings waiting to be issued',D.bookings.filter(b=>b.status==='booked').length,(()=>{const bk=D.bookings.filter(b=>b.status==='booked');return bk.length?`<table><tr><th>Customer / site</th><th>Job</th><th>Wanted</th><th>Priority</th></tr>${bk.map(b=>`<tr><td>${esc(b.customer)}<div class="mute small">${esc(b.site||'')}</div></td><td>${esc(b.job_type||'')}<div class="mute small">${esc(b.description)}</div></td><td>${b.wanted_date?uk(b.wanted_date):''}</td><td>${b.priority==='Urgent'?'<span class="pill red">URGENT</span>':'Normal'}</td></tr>`).join('')}</table>`:none('No bookings waiting.');})())+
+    sec('Jobs in progress',d.prog.length,progBody);
+  $('tPrint').onclick=()=>window.print();
+  $('tCsv').onclick=()=>{
+    const rows=[];
+    d.due.forEach(x=>rows.push(['Due / overdue',uk(x.iso),x.days<0?'OVERDUE '+(-x.days)+' days':x.days===0?'Today':'In '+x.days+' days',x.kind,x.r.customer,x.r.site,x.r.crane_no,x.eng,'']));
+    d.urgent.forEach(x=>rows.push(['Urgent repair',uk(x.r.report_date),'Urgent','',x.r.customer,x.r.site,x.r.crane_no,x.eng,(x.it.group||'')+' - '+x.it.label+(x.it.note?': '+x.it.note:'')]));
+    d.pend.forEach(p=>rows.push(['PO awaiting approval',uk((p.created_at||'').slice(0,10)),'Pending','','',p.site_ref,'',p.engineer_name,p.description+(p.est_value?' ('+p.est_value+')':'')]));
+    d.done.forEach(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean);rows.push(['Completed',uk(r.report_date),'Done',r.visit_type||'Service',r.customer,r.site,r.crane_no,d.canon(r.engineer),it.filter(i=>i.status==='URGENT').length+' urgent, '+it.filter(i=>i.status==='ATTN').length+' attn']);});
+    D.bookings.filter(b=>b.status==='booked').forEach(b=>rows.push(['Booking to issue',b.wanted_date?uk(b.wanted_date):'',b.priority,b.job_type||'',b.customer,b.site,'','',b.description]));
+    d.prog.forEach(j=>{const x=j.data;rows.push(['Job in progress',uk(x.date),'In progress',x.type,x.customerName||x.customer,x.site,'',(x.engineers||[]).map(d.canon).join(' + '),'Job '+(x.job||j.id)]);});
+    csvDownload('todays_list_'+todayIso()+'.csv',['Section','Date','Status','Type','Customer','Site','Crane','Engineer','Details'],rows);
+  };
+}
+const cap = n => String(n||'').replace(/^./,c=>c.toUpperCase());
+const JOB_TYPES = ['Service','Inspection','LOLER','Repair','Breakdown / call-out','Installation','Quote visit','Other'];
+async function patchBooking(id, fields){
+  await api('/rest/v1/bookings?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(fields)});
+}
+async function notifyEngineer(id){
+  const res=await fetch(SB.url+'/functions/v1/push-send',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+await token(),'Content-Type':'application/json'},body:JSON.stringify({action:'send',booking_id:id})});
+  const j=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(j.error||('Notification failed ('+res.status+')'));
+  return j;
+}
+function bookingText(b){
+  return ['New job from Key Engineering'+(b.priority==='Urgent'?' - URGENT':''),
+    b.customer, b.site||'', b.contact?('Contact: '+b.contact+(b.phone?' '+b.phone:'')):(b.phone?'Phone: '+b.phone:''),
+    (b.job_type||'')+(b.wanted_date?' - wanted '+uk(b.wanted_date):''), b.description].filter(Boolean).join('\n');
+}
+async function issueBooking(b, engId){
+  const person=D.people.find(x=>x.id===engId);
+  if(!person) throw new Error('Choose an engineer first');
+  await patchBooking(b.id,{engineer_id:engId,engineer_name:cap(person.name),status:'issued',issued_at:new Date().toISOString()});
+  let note='';
+  try{
+    const r=await notifyEngineer(b.id);
+    note = r.sent ? `Issued to ${cap(person.name)} and their phone has been notified.` : r.devices ? `Issued to ${cap(person.name)}, but the notification could not be delivered — use the Text button.` : `Issued to ${cap(person.name)}. They haven't switched on phone notifications yet — use the Text button.`;
+  }catch(e){ note=`Issued to ${cap(person.name)}, but the notification failed (${e.message}) — use the Text button.`; }
+  return note;
+}
+async function textEngineer(b){
+  let num=D.phones[b.engineer_id];
+  if(!num){
+    num=(window.prompt('Mobile number for '+(b.engineer_name||'this engineer')+':')||'').replace(/[^0-9+]/g,'');
+    if(!num) return;
+    await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:b.engineer_id,phone:num})});
+    D.phones[b.engineer_id]=num;
+  }
+  window.location.href='sms:'+num+'?&body='+encodeURIComponent(bookingText(b));
+}
+function viewBookings(){
+  const people=D.people, opt=(sel)=>people.map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc(cap(x.name))}</option>`).join('');
+  const open=D.bookings.filter(b=>b.status==='booked');
+  const out=D.bookings.filter(b=>b.status==='issued'||b.status==='accepted');
+  const cutoff=addDays(todayIso(),-7);
+  const done=D.bookings.filter(b=>b.status==='done'&&(b.done_at||'').slice(0,10)>=cutoff);
+  const card=(b,mode)=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between"><b>${esc(b.customer)}</b><span>${b.priority==='Urgent'?'<span class="pill red">URGENT</span> ':''}<span class="pill ${b.status==='done'?'green':b.status==='accepted'?'green':b.status==='issued'?'amber':'grey'}">${esc(b.status)}</span></span></div>
+    <div class="mute small">${esc([b.site,b.job_type,b.wanted_date?'wanted '+uk(b.wanted_date):''].filter(Boolean).join(' · '))}</div>
+    <div class="small" style="margin:6px 0">${esc(b.description)}</div>
+    <div class="mute small">${b.contact||b.phone?'Contact: '+esc([b.contact,b.phone].filter(Boolean).join(' · '))+' · ':''}Booked ${uk((b.created_at||'').slice(0,10))}${b.engineer_name?' · Engineer: '+esc(b.engineer_name):''}${b.accepted_at?' · Accepted '+uk(b.accepted_at.slice(0,10)):''}</div>
+    <div class="bar" style="margin:10px 0 0;padding:8px;box-shadow:none">
+    ${mode==='open'?`<select data-eng="${esc(b.id)}"><option value="">Choose engineer…</option>${opt(b.engineer_id)}</select><button class="primary" data-act="issue" data-id="${esc(b.id)}">Issue</button>`:''}
+    ${mode==='out'?`<button data-act="text" data-id="${esc(b.id)}">Text</button><button data-act="notify" data-id="${esc(b.id)}">Notify again</button><button data-act="done" data-id="${esc(b.id)}">Mark done</button>`:''}
+    ${mode==='done'?`<button data-act="text" data-id="${esc(b.id)}">Text</button>`:''}
+    <span class="sp"></span>${mode!=='done'?`<button data-act="cancel" data-id="${esc(b.id)}">Cancel booking</button>`:''}</div></div>`;
+  $('v-bookings').innerHTML=`<div class="card"><h2>New booking <span class="mute small">customer rings the office</span></h2>
+    <form id="bkForm"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <label class="small">Customer *<input name="customer" required class="fld"></label>
+      <label class="small">Site / address<input name="site" class="fld"></label>
+      <label class="small">Contact name<input name="contact" class="fld"></label>
+      <label class="small">Contact phone<input name="phone" type="tel" class="fld"></label>
+      <label class="small">Type of job<select name="job_type" class="fld">${JOB_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></label>
+      <label class="small">Priority<select name="priority" class="fld"><option>Normal</option><option>Urgent</option></select></label>
+      <label class="small">Date wanted<input name="wanted_date" type="date" class="fld"></label>
+      <label class="small">Engineer (optional)<select name="engineer" class="fld"><option value="">Decide later</option>${opt('')}</select></label>
+    </div>
+    <label class="small" style="display:block;margin-top:10px">What needs doing *<textarea name="description" required rows="3" class="fld" style="width:100%"></textarea></label>
+    <div class="bar" style="margin:12px 0 0;padding:0;border:0;box-shadow:none"><button class="primary" type="submit" data-issue="0">Save booking</button><button type="submit" data-issue="1">Save &amp; issue to engineer</button><span class="mute small" id="bkMsg"></span></div></form></div>
+    <div class="card"><h2>Waiting to be issued <span class="mute small">${open.length}</span></h2>${open.length?open.map(b=>card(b,'open')).join(''):'<span class="mute">No bookings waiting.</span>'}</div>
+    <div class="card"><h2>Out with engineers <span class="mute small">${out.length}</span></h2>${out.length?out.map(b=>card(b,'out')).join(''):'<span class="mute">Nothing issued at the moment.</span>'}</div>
+    <div class="card"><h2>Done in the last 7 days <span class="mute small">${done.length}</span></h2>${done.length?done.map(b=>card(b,'done')).join(''):'<span class="mute">None.</span>'}</div>
+    <div class="card"><details><summary>Engineer mobile numbers (for the Text button)</summary><div class="wrap" style="margin-top:10px"><table>${people.map(x=>`<tr><td>${esc(cap(x.name))}</td><td><input class="fld" data-phone="${esc(x.id)}" type="tel" value="${esc(D.phones[x.id]||'')}" placeholder="07…"></td></tr>`).join('')}</table></div></details></div>`;
+  document.querySelectorAll('#v-bookings .fld').forEach(el=>{el.style.cssText+=';width:100%;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;box-sizing:border-box';});
+  const say=(m,err)=>{$('msg').innerHTML=`<div class="${err?'err':'note'}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:'smooth'});};
+  let wantIssue=false;
+  $('bkForm').querySelectorAll('button[type=submit]').forEach(b=>b.onclick=()=>{wantIssue=b.dataset.issue==='1';});
+  $('bkForm').onsubmit=async e=>{
+    e.preventDefault();
+    const f=new FormData($('bkForm')), v=k=>String(f.get(k)||'').trim();
+    const eng=v('engineer');
+    if(wantIssue&&!eng){ say('Choose an engineer to issue it to, or use Save booking.',true); return; }
+    $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=true);
+    try{
+      const res=await api('/rest/v1/bookings',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({customer:v('customer'),site:v('site')||null,contact:v('contact')||null,phone:v('phone')||null,job_type:v('job_type'),priority:v('priority'),wanted_date:v('wanted_date')||null,description:v('description')})});
+      const made=(await res.json())[0];
+      let msg='Booking saved.';
+      if(wantIssue&&made) msg=await issueBooking(made,eng);
+      else if(eng&&made){ const pe=D.people.find(x=>x.id===eng); await patchBooking(made.id,{engineer_id:eng,engineer_name:cap(pe&&pe.name)}); }
+      await load(); render(); say(msg,false);
+    }catch(err){ say('Could not save: '+err.message,true); $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=false); }
+  };
+  $('v-bookings').querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{
+    const b=D.bookings.find(x=>x.id===btn.dataset.id); if(!b) return;
+    btn.disabled=true;
+    try{
+      const act=btn.dataset.act;
+      if(act==='issue'){ const eng=document.querySelector(`select[data-eng="${b.id}"]`).value; const msg=await issueBooking(b,eng); await load(); render(); say(msg,false); return; }
+      if(act==='text'){ await textEngineer(b); btn.disabled=false; render(); return; }
+      if(act==='notify'){ const r=await notifyEngineer(b.id); say(r.sent?'Notification sent.':r.devices?'The notification could not be delivered — use the Text button.':'That engineer has not switched on phone notifications yet — use the Text button.',!r.sent); btn.disabled=false; return; }
+      if(act==='done'){ await patchBooking(b.id,{status:'done',done_at:new Date().toISOString()}); }
+      if(act==='cancel'){ if(!confirm('Cancel this booking?')){btn.disabled=false;return;} await patchBooking(b.id,{status:'cancelled'}); }
+      await load(); render();
+    }catch(err){ say(err.message,true); btn.disabled=false; }
+  });
+  $('v-bookings').querySelectorAll('input[data-phone]').forEach(i=>i.onchange=async()=>{
+    const num=i.value.replace(/[^0-9+]/g,'');
+    try{ await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:i.dataset.phone,phone:num})}); D.phones[i.dataset.phone]=num; i.value=num; say('Number saved.',false); }
+    catch(err){ say('Could not save number: '+err.message,true); }
+  });
+}
 function viewWeek(){ if(invMode) viewInvoice(); else viewWeekEngineers(); }
 function hrsText(j){ return [j.nt?j.nt+' normal':'',j.ot?j.ot+' OT1':'',j.dt?j.dt+' OT2':''].filter(Boolean).join(', ')+(j.n>1?' × '+j.n+' engineers':''); }
 function viewInvoice(){
@@ -408,8 +565,8 @@ function viewInvoice(){
   Object.keys(by).sort().forEach(c=>{
     const js=by[c], ct=js.reduce((s,j)=>s+j.total,0);
     html+=`<div class="card"><h2>${esc(c)} <span>${gbp(ct)}</span></h2><div class="wrap"><table>
-    <tr><th>Job</th><th>Site / type</th><th>Engineers</th><th class="r">Labour</th><th class="r">Mileage</th><th class="r">Call-out</th><th class="r">Materials £</th><th class="r">Total</th></tr>
-    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.site)}<div class="mute small">${esc(j.type)}</div></td><td>${esc(j.engs.join(', '))}</td><td class="r">${gbp(j.labour)}<div class="mute small">${esc(hrsText(j))}</div></td><td class="r">${gbp(j.mileage)}<div class="mute small">${j.mile?j.mile+' miles':''}</div></td><td class="r">${j.call?gbp(j.call):''}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    <tr><th>Job</th><th>Site / type</th><th>Engineers</th><th>Work carried out</th><th class="r">Labour</th><th class="r">Mileage</th><th class="r">Call-out</th><th class="r">Materials £</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.site)}<div class="mute small">${esc(j.type)}</div></td><td>${esc(j.engs.join(', '))}</td><td style="white-space:pre-wrap;min-width:200px;max-width:340px">${esc(j.notes)}${j.defects?`<div class="mute small">Follow-up: ${esc(j.defects)}</div>`:''}</td><td class="r">${gbp(j.labour)}<div class="mute small">${esc(hrsText(j))}</div></td><td class="r">${gbp(j.mileage)}<div class="mute small">${j.mile?j.mile+' miles':''}</div></td><td class="r">${j.call?gbp(j.call):''}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
     </table></div></div>`;
   });
   $('v-week').innerHTML=html;
@@ -507,6 +664,10 @@ function runGlobalSearch(){
     const hay=[p.po_number,p.engineer_name,p.site_ref,p.description,p.status,p.requested_by].join(' ');
     if(has(hay)) hits.push({type:'Purchase order',main:(p.po_number||'PO request')+' · '+(p.site_ref||p.engineer_name||'Request'),sub:[p.status,p.description].filter(Boolean).join(' · '),tab:'po',key:p.id});
   });
+  D.bookings.forEach(b=>{
+    const hay=[b.customer,b.site,b.contact,b.phone,b.description,b.job_type,b.engineer_name,b.status].join(' ');
+    if(has(hay)) hits.push({type:'Booking',main:(b.customer||'Booking')+' · '+(b.site||''),sub:[b.status,b.job_type,b.engineer_name].filter(Boolean).join(' · '),tab:'bookings',key:b.id});
+  });
   const limited=hits.slice(0,30);
   box.innerHTML=`<div class="result-head">${hits.length} matching record${hits.length===1?'':'s'}${hits.length>30?' · showing first 30':''}</div>`+
     (limited.length?limited.map((h,i)=>`<div class="result" role="button" tabindex="0" data-hit="${i}"><div class="result-type">${esc(h.type)}</div><div><div class="result-main">${esc(h.main)}</div><div class="result-sub">${esc(h.sub)}</div></div><div class="result-go">Open section →</div></div>`).join(''):`<div class="empty-state">No matching records in the data currently loaded. Try a customer name, crane number, job number or PO reference.</div>`);
@@ -518,14 +679,14 @@ function runGlobalSearch(){
 }
 
 // ---------- shell ----------
-const TABS=[['overview','Overview'],['week','Week by engineer'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders']];
+const TABS=[['overview','Overview'],['today','Today'],['bookings','Bookings'],['week','Week by engineer'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders']];
 function render(){
   const due=dueList(), rep=repairsList();
-  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length};
+  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length, bookings:D.bookings.filter(b=>b.status==='booked').length};
   $('tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${badge[k]?`<span class="n ${k==='due'?'hot':''}">${badge[k]}</span>`:''}</button>`).join('');
   $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;store.set('tab',tab);render();});
   TABS.forEach(([k])=>$('v-'+k).classList.toggle('hide',k!==tab));
-  ({overview:viewOverview,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo})[tab]();
+  ({overview:viewOverview,today:viewToday,bookings:viewBookings,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo})[tab]();
 }
 async function refresh(){ $('refresh').disabled=true; try{ await load(); render(); }catch(e){ if(!store.get('session')) showLogin(e.message); else $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; } finally{ $('refresh').disabled=false; } }
 function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').className='err'+(m?'':' hide'); $('loginErr').textContent=m||''; }
