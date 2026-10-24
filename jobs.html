@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101d2d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KE Jobs">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Key Engineering Jobs</title>
+<style>
+:root{--bg:#eef2f6;--card:#fff;--ink:#172334;--mute:#65758a;--line:#d8e0e9;--accent:#f2a900;--navy:#101d2d;--red:#c62828;--amber:#a96500;--green:#147a43;--redbg:#fff0ef;--ambbg:#fff5df;--grnbg:#e8f7ed}
+@media(prefers-color-scheme:dark){:root{--bg:#0d141d;--card:#151f2b;--ink:#eef3f8;--mute:#9babbc;--line:#2b3949;--red:#ff8c84;--amber:#ffca6a;--green:#6fdda0;--redbg:#3b2021;--ambbg:#3b3019;--grnbg:#173527}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+header{background:var(--navy);color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;border-bottom:4px solid var(--accent);display:flex;align-items:center;gap:10px}
+header h1{font-size:18px;margin:0;flex:1}
+header button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-size:14px}
+main{max-width:620px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:18px 2px 8px}
+button,input{font:inherit}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;min-height:46px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#172334}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row .btn{flex:1;min-width:120px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:800}
+.pill.red{background:var(--redbg);color:var(--red)}.pill.amber{background:var(--ambbg);color:var(--amber)}.pill.green{background:var(--grnbg);color:var(--green)}
+.mute{color:var(--mute)}.small{font-size:13px}
+.top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.top b{font-size:18px}
+.msg{padding:11px 13px;border-radius:12px;margin-bottom:12px;font-size:14px}
+.msg.err{background:var(--redbg);color:var(--red)}.msg.ok{background:var(--grnbg);color:var(--green)}.msg.note{background:var(--ambbg);color:var(--amber)}
+#login{max-width:360px;margin:10vh auto;padding:0 16px}
+#login input{width:100%;padding:13px;margin:6px 0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+#login .btn{width:100%;margin-top:8px}
+.hide{display:none!important}
+.desc{margin:8px 0;white-space:pre-wrap}
+a{color:inherit}
+</style>
+</head>
+<body>
+
+<div id="login" class="hide">
+  <h2 style="margin-top:0">Key Engineering</h2>
+  <h1 style="margin:0 0 6px">Jobs</h1>
+  <p class="mute small">Sign in with your normal Key Engineering account.</p>
+  <div id="loginErr" class="msg err hide"></div>
+  <input id="em" type="email" placeholder="Email" autocomplete="username">
+  <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="btn primary" id="go">Sign in</button>
+</div>
+
+<div id="app" class="hide">
+  <header><h1>My jobs</h1><button id="refresh">Refresh</button><button id="out">Sign out</button></header>
+  <main>
+    <div id="flash"></div>
+    <div id="notifyCard" class="card"></div>
+    <h2>To do</h2><div id="todo"></div>
+    <h2>Done in the last 7 days</h2><div id="done"></div>
+  </main>
+</div>
+
+<script>
+const SB = {url:'https://eyerpokgadrgxticqzez.supabase.co', key:'sb_publishable_FsyUdlUOTgA51pkAy5pNiA_AsHqq6Ed'};
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uk = s => { const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(s||'')); return m ? `${m[3]}/${m[2]}/${m[1]}` : ''; };
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem('ke_jobs_'+k)); }catch(e){ return null; } },
+                set(k,v){ try{ localStorage.setItem('ke_jobs_'+k, JSON.stringify(v)); }catch(e){} },
+                del(k){ try{ localStorage.removeItem('ke_jobs_'+k); }catch(e){} } };
+
+// ---------- sign-in ----------
+function saveSession(j){
+  const old = store.get('session') || {};
+  store.set('session', {access_token:j.access_token, refresh_token:j.refresh_token||old.refresh_token,
+    expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),
+    uid:(j.user&&j.user.id)||old.uid||'', email:(j.user&&j.user.email)||old.email||''});
+  return store.get('session');
+}
+async function token(){
+  const s = store.get('session');
+  if(!s) throw new Error('Not signed in');
+  if(s.expires_at - 60 > Date.now()/1000) return s.access_token;
+  const res = await fetch(SB.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});
+  if(!res.ok){ store.del('session'); throw new Error('Your sign-in has expired — please sign in again'); }
+  return saveSession(await res.json()).access_token;
+}
+async function api(path, opts){
+  const t = await token();
+  const res = await fetch(SB.url+path, Object.assign({}, opts, {headers:Object.assign({apikey:SB.key, Authorization:'Bearer '+t}, (opts&&opts.headers)||{})}));
+  if(!res.ok){ let m=''; try{ const j=await res.json(); m=j.message||j.error||''; }catch(e){} throw new Error((res.status+' '+m).trim()); }
+  return res;
+}
+function flash(text, kind){ $('flash').innerHTML = text ? `<div class="msg ${kind||'note'}">${esc(text)}</div>` : ''; }
+function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').classList.toggle('hide',!m); $('loginErr').textContent=m||''; }
+
+// ---------- jobs ----------
+let jobs = [];
+async function loadJobs(){
+  const s = store.get('session');
+  const since = new Date(Date.now()-7*864e5).toISOString();
+  const res = await api(`/rest/v1/bookings?select=*&engineer_id=eq.${encodeURIComponent(s.uid)}&status=in.(issued,accepted,done)&order=created_at.desc&limit=100`);
+  jobs = (await res.json()).filter(b => b.status !== 'done' || (b.done_at||'') >= since);
+  renderJobs();
+}
+function jobCard(b){
+  const maps = b.site ? 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(b.site) : '';
+  const tel = String(b.phone||'').replace(/[^0-9+]/g,'');
+  return `<div class="card">
+    <div class="top"><b>${esc(b.customer)}</b><span>${b.priority==='Urgent'?'<span class="pill red">URGENT</span> ':''}<span class="pill ${b.status==='issued'?'amber':'green'}">${b.status==='issued'?'NEW':b.status.toUpperCase()}</span></span></div>
+    <div class="mute small">${esc([b.job_type,b.wanted_date?'wanted '+uk(b.wanted_date):''].filter(Boolean).join(' · '))}</div>
+    ${b.site?`<div style="margin-top:6px">📍 ${esc(b.site)}</div>`:''}
+    <div class="desc">${esc(b.description)}</div>
+    ${b.contact||b.phone?`<div class="small mute">Contact: ${esc([b.contact,b.phone].filter(Boolean).join(' · '))}</div>`:''}
+    <div class="row">
+      ${maps?`<a class="btn" href="${maps}" target="_blank" rel="noopener">Directions</a>`:''}
+      ${tel?`<a class="btn" href="tel:${esc(tel)}">Call customer</a>`:''}
+    </div>
+    <div class="row">
+      ${b.status==='issued'?`<button class="btn primary" data-act="accepted" data-id="${esc(b.id)}">Accept job</button>`:''}
+      ${b.status==='accepted'?`<button class="btn primary" data-act="done" data-id="${esc(b.id)}">Mark done</button>`:''}
+    </div></div>`;
+}
+function renderJobs(){
+  const todo = jobs.filter(b=>b.status!=='done'), done = jobs.filter(b=>b.status==='done');
+  $('todo').innerHTML = todo.length ? todo.map(jobCard).join('') : '<div class="card mute">No jobs waiting. New ones from the office will appear here.</div>';
+  $('done').innerHTML = done.length ? done.map(jobCard).join('') : '<div class="card mute">None.</div>';
+  document.querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{
+    btn.disabled = true;
+    const now = new Date().toISOString();
+    const f = btn.dataset.act==='accepted' ? {status:'accepted',accepted_at:now} : {status:'done',done_at:now};
+    try{
+      await api('/rest/v1/bookings?id=eq.'+encodeURIComponent(btn.dataset.id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(f)});
+      flash(btn.dataset.act==='accepted'?'Job accepted — the office can see it.':'Job marked done.','ok');
+      await loadJobs();
+    }catch(e){ flash('Could not update: '+e.message,'err'); btn.disabled=false; }
+  });
+}
+
+// ---------- phone notifications ----------
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+function b64ToBytes(b64){ const p='='.repeat((4-b64.length%4)%4); const s=atob((b64+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from([...s].map(c=>c.charCodeAt(0))); }
+async function fn(action){
+  const res = await fetch(SB.url+'/functions/v1/push-send',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+await token(),'Content-Type':'application/json'},body:JSON.stringify({action})});
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(j.error||('Request failed ('+res.status+')'));
+  return j;
+}
+async function currentSub(){
+  if(!pushSupported) return null;
+  const reg = await navigator.serviceWorker.getRegistration();
+  return reg ? reg.pushManager.getSubscription() : null;
+}
+async function renderNotify(){
+  const card = $('notifyCard');
+  if(!pushSupported || (isIOS && !isStandalone)){
+    card.innerHTML = `<b>Job notifications</b><p class="small mute" style="margin:6px 0 0">${isIOS && !isStandalone
+      ? 'To get a buzz when the office sends you a job: tap the Share button in Safari, choose <b>Add to Home Screen</b>, then open <b>KE Jobs</b> from your home screen and come back here.'
+      : "This browser can't receive job notifications. Use Chrome on Android, or add this page to your iPhone's home screen."}</p>`;
+    return;
+  }
+  const sub = await currentSub().catch(()=>null);
+  const perm = Notification.permission;
+  if(sub && perm==='granted'){
+    card.innerHTML = `<b>Job notifications are on ✓</b><p class="small mute" style="margin:6px 0 0">This phone will buzz when the office sends you a job.</p>
+      <div class="row"><button class="btn" id="nTest">Send me a test</button><button class="btn" id="nOff">Turn off</button></div>`;
+    $('nTest').onclick = async()=>{ try{ const r=await fn('test'); flash(r.sent?'Test sent — your phone should buzz in a few seconds.':'Could not deliver a test. Try turning notifications off and on again.', r.sent?'ok':'err'); }catch(e){ flash(e.message,'err'); } };
+    $('nOff').onclick = async()=>{ try{ await api('/rest/v1/push_subscriptions?endpoint=eq.'+encodeURIComponent(sub.endpoint),{method:'DELETE'}); await sub.unsubscribe(); flash('Notifications turned off.','note'); }catch(e){ flash(e.message,'err'); } renderNotify(); };
+  } else if(perm==='denied'){
+    card.innerHTML = `<b>Job notifications are blocked</b><p class="small mute" style="margin:6px 0 0">Allow notifications for this page in your phone's settings, then come back.</p>`;
+  } else {
+    card.innerHTML = `<b>Get a buzz when a job comes in</b><p class="small mute" style="margin:6px 0 0">Switch on notifications so the office can send jobs straight to this phone.</p><div class="row"><button class="btn primary" id="nOn">Turn on job notifications</button></div>`;
+    $('nOn').onclick = async()=>{
+      $('nOn').disabled = true;
+      try{
+        if(await Notification.requestPermission() !== 'granted') throw new Error('Notifications were not allowed.');
+        const reg = await navigator.serviceWorker.register('sw.js');
+        await navigator.serviceWorker.ready;
+        const {publicKey} = await fn('key');
+        let sub = await reg.pushManager.getSubscription();
+        if(!sub) sub = await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToBytes(publicKey)});
+        await api('/rest/v1/push_subscriptions?on_conflict=endpoint',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({endpoint:sub.endpoint})});
+        flash('Notifications are on.','ok');
+      }catch(e){ flash('Could not turn on notifications: '+e.message,'err'); }
+      renderNotify();
+    };
+  }
+}
+
+// ---------- shell ----------
+async function refresh(){
+  $('refresh').disabled = true;
+  try{ await loadJobs(); }catch(e){ if(!store.get('session')) showLogin(e.message); else flash(e.message,'err'); }
+  $('refresh').disabled = false;
+}
+async function showApp(){
+  $('login').classList.add('hide'); $('app').classList.remove('hide');
+  if(pushSupported) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  renderNotify(); await refresh();
+}
+$('go').onclick = async()=>{
+  $('go').disabled = true;
+  try{
+    const res = await fetch(SB.url+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:$('em').value.trim(),password:$('pw').value})});
+    const j = await res.json().catch(()=>({}));
+    if(!res.ok){ const m=j.error_description||j.msg||j.message||''; throw new Error(/invalid/i.test(m)?"That email or password isn't right. Use your full email address.":(m||'Sign-in failed ('+res.status+')')); }
+    saveSession(j); $('pw').value=''; await showApp();
+  }catch(e){ showLogin(e.name==='TypeError'?'No connection — check your signal and try again.':e.message); }
+  $('go').disabled = false;
+};
+$('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') $('go').click(); });
+$('out').onclick = async()=>{ try{ const sub=await currentSub(); if(sub) await api('/rest/v1/push_subscriptions?endpoint=eq.'+encodeURIComponent(sub.endpoint),{method:'DELETE'}).catch(()=>{}); }catch(e){} store.del('session'); showLogin(''); };
+$('refresh').onclick = refresh;
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && store.get('session')) refresh(); });
+setInterval(()=>{ if(!document.hidden && store.get('session')) refresh(); }, 60000);
+if(store.get('session')) showApp(); else showLogin('');
+</script>
+</body>
+</html>
