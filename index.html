@@ -5,48 +5,156 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Key Engineering Office</title>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--ink:#1b2430;--mute:#667085;--line:#dfe3e8;--accent:#0b5cad;--red:#c62828;--amber:#b26a00;--green:#1b7f3b;--redbg:#fdecea;--ambbg:#fff4e0;--grnbg:#e8f5ec}
-@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b222b;--ink:#e8ecf1;--mute:#97a3b2;--line:#2c3643;--accent:#5aa2ee;--red:#ff8a80;--amber:#ffc266;--green:#6fd08c;--redbg:#3a1d1b;--ambbg:#3a2c12;--grnbg:#173323}}
+:root{
+ --bg:#eef2f6;--card:#ffffff;--ink:#172334;--mute:#65758a;--line:#d8e0e9;
+ --accent:#f2a900;--accent-dark:#cc8500;--navy:#101d2d;--navy2:#1b2e43;
+ --red:#c62828;--amber:#a96500;--green:#147a43;
+ --redbg:#fff0ef;--ambbg:#fff5df;--grnbg:#e8f7ed;
+ --shadow:0 8px 24px rgba(18,35,54,.07);--radius:16px;
+}
+@media(prefers-color-scheme:dark){
+ :root{--bg:#0d141d;--card:#151f2b;--ink:#eef3f8;--mute:#9babbc;--line:#2b3949;
+ --accent:#ffbf26;--accent-dark:#e7a300;--navy:#080e16;--navy2:#142235;
+ --red:#ff8c84;--amber:#ffca6a;--green:#6fdda0;--redbg:#3b2021;--ambbg:#3b3019;--grnbg:#173527;
+ --shadow:0 8px 24px rgba(0,0,0,.18)}
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
-header h1{font-size:17px;margin:0;flex:1;min-width:160px}
-header .who{color:var(--mute);font-size:13px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;padding:15px clamp(14px,3vw,32px);display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;box-shadow:0 5px 20px rgba(0,0,0,.16);border-bottom:4px solid var(--accent)}
+header h1{font-size:19px;letter-spacing:.2px;margin:0;flex:1;min-width:190px;font-weight:800}
+header h1:before{content:"KE";display:inline-grid;place-items:center;width:36px;height:36px;margin-right:11px;background:var(--accent);color:#111c29;border-radius:10px;font-size:13px;font-weight:950;vertical-align:middle;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+header .who{color:#d1dbe6;font-size:12px}
 button,select,input{font:inherit;color:inherit}
-button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-button:disabled{opacity:.5;cursor:default}
-nav{display:flex;gap:4px;padding:10px 16px 0;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line)}
-nav button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 12px;white-space:nowrap;color:var(--mute)}
-nav button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
-nav .n{display:inline-block;min-width:20px;padding:0 6px;margin-left:5px;border-radius:10px;background:var(--line);font-size:12px;text-align:center}
+button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 13px rgba(0,0,0,.1);border-color:var(--accent)}
+button:active{transform:translateY(0)}
+header button{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.22);color:white}
+header button:hover{background:rgba(255,255,255,.16)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#172334;font-weight:800}
+button:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+nav{display:flex;gap:5px;padding:8px clamp(10px,3vw,32px) 0;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:70px;z-index:15;box-shadow:0 3px 10px rgba(18,35,54,.04)}
+nav button{border:0;border-bottom:3px solid transparent;border-radius:10px 10px 0 0;background:none;padding:12px 15px;white-space:nowrap;color:var(--mute);box-shadow:none;font-weight:650}
+nav button:hover{transform:none;box-shadow:none;background:var(--bg)}
+nav button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:850;background:linear-gradient(0deg,rgba(242,169,0,.12),transparent)}
+nav .n{display:inline-block;min-width:21px;padding:1px 7px;margin-left:7px;border-radius:99px;background:var(--line);font-size:11px;text-align:center;font-weight:800}
 nav .n.hot{background:var(--red);color:#fff}
-main{max-width:1100px;margin:0 auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
-.card h2{font-size:16px;margin:0 0 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.tile b{display:block;font-size:24px}.tile span{color:var(--mute);font-size:13px}
+main{max-width:1500px;margin:0 auto;padding:clamp(12px,2vw,26px)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(14px,2vw,22px);margin-bottom:17px;box-shadow:var(--shadow)}
+.card h2{font-size:16px;margin:0 0 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;font-weight:800;letter-spacing:.1px}
+.card h2:before{content:"";width:4px;height:19px;background:var(--accent);border-radius:5px;margin-right:1px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:13px;margin-bottom:18px}
+.tile{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow);min-height:112px}
+.tile:after{content:"";position:absolute;right:-19px;top:-24px;width:82px;height:82px;border-radius:50%;background:var(--accent);opacity:.09}
+.tile b{display:block;font-size:clamp(25px,3vw,34px);line-height:1.15;margin-bottom:8px;letter-spacing:-.8px;font-weight:850;font-variant-numeric:tabular-nums}
+.tile span{color:var(--mute);font-size:12px;font-weight:700;letter-spacing:.2px}
+.tile.red{border-top:3px solid var(--red)}.tile.amber{border-top:3px solid var(--accent)}.tile.green{border-top:3px solid var(--green)}
 .tile.red b{color:var(--red)}.tile.amber b{color:var(--amber)}.tile.green b{color:var(--green)}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.08em;background:var(--bg);position:sticky;top:0}
+th:first-child{border-radius:8px 0 0 8px}th:last-child{border-radius:0 8px 8px 0}
+tbody tr:hover,table tr:hover td{background:rgba(242,169,0,.045)}
 td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
-.wrap{overflow-x:auto}
-.pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.wrap{overflow:auto;border-radius:10px}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:850;letter-spacing:.035em;white-space:nowrap}
 .pill.red{background:var(--redbg);color:var(--red)}.pill.amber{background:var(--ambbg);color:var(--amber)}.pill.green{background:var(--grnbg);color:var(--green)}.pill.grey{background:var(--line);color:var(--mute)}
-.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--card);border:1px solid var(--line);padding:12px;border-radius:14px;box-shadow:var(--shadow)}
 .bar .sp{flex:1}
-.mute{color:var(--mute)}.small{font-size:13px}
-.err{background:var(--redbg);color:var(--red);padding:10px 12px;border-radius:8px;margin-bottom:12px}
-.note{background:var(--ambbg);color:var(--amber);padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:13px}
-#login{max-width:340px;margin:12vh auto;padding:0 16px}
-#login input{width:100%;padding:10px;margin:6px 0;border:1px solid var(--line);border-radius:8px;background:var(--card)}
-#login button{width:100%;margin-top:8px;padding:10px}
-details summary{cursor:pointer;color:var(--accent)}
+.bar select,.bar input{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 11px;min-height:40px}
+.mute{color:var(--mute)}.small{font-size:12px}
+.err{background:var(--redbg);color:var(--red);padding:12px 14px;border:1px solid currentColor;border-radius:12px;margin-bottom:12px}
+.note{background:var(--ambbg);color:var(--amber);padding:12px 14px;border:1px solid rgba(242,169,0,.3);border-radius:12px;margin-bottom:14px;font-size:12px}
+#login{max-width:390px;margin:12vh auto;padding:28px;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+#login h1{margin-top:0;font-size:26px;letter-spacing:-.7px}
+#login h1:before{content:"KE";display:inline-grid;place-items:center;width:43px;height:43px;margin-right:11px;background:var(--accent);color:#172334;border-radius:12px;font-size:14px;font-weight:950;vertical-align:middle}
+#login input{width:100%;padding:12px;margin:6px 0;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+#login button{width:100%;margin-top:10px;padding:12px}
+details summary{cursor:pointer;color:var(--accent-dark);font-weight:700}
 .hide{display:none!important}
-@media (max-width:600px){main{padding:10px}th,td{padding:6px 4px;font-size:13px}}
+#msg:empty{display:none}
+
+/* Control-room layer */
+.commandbar{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(150px,.7fr);gap:12px;margin:0 0 18px}
+.command-search{position:relative;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px 13px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.command-search .search-icon{font-size:20px;color:var(--accent-dark)}
+.command-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;padding:7px 0}
+.command-search .hint{font-size:10px;color:var(--mute);white-space:nowrap;border:1px solid var(--line);padding:3px 6px;border-radius:5px}
+.command-status{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;border-radius:15px;padding:12px 15px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.command-status .status-dot{width:10px;height:10px;border-radius:50%;background:#62d995;box-shadow:0 0 0 5px rgba(98,217,149,.14);flex-shrink:0}
+.command-status b{display:block;font-size:12px}.command-status span{display:block;color:#c8d4e1;font-size:11px}
+.search-results{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);margin:-8px 0 18px;overflow:hidden}
+.search-results .result-head{padding:10px 14px;background:var(--bg);font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.search-results .result{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer}
+.search-results .result:hover{background:rgba(242,169,0,.08)}
+.search-results .result-type{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:800}
+.search-results .result-main{font-weight:750;overflow-wrap:anywhere}
+.search-results .result-sub{font-size:11px;color:var(--mute);overflow-wrap:anywhere}
+.search-results .result-go{font-size:11px;color:var(--accent-dark);font-weight:800}
+.control-hero{position:relative;overflow:hidden;background:linear-gradient(115deg,#101d2d 0%,#1d344b 68%,#2a4055 100%);color:#fff;border-radius:19px;padding:23px clamp(16px,3vw,30px);margin-bottom:17px;box-shadow:var(--shadow)}
+.control-hero:after{content:"";position:absolute;right:-55px;top:-100px;width:280px;height:280px;border:35px solid rgba(242,169,0,.13);border-radius:50%;pointer-events:none}
+.control-hero .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.17em;color:#f2b92c;font-weight:900}
+.control-hero h2{font-size:clamp(22px,3vw,32px);line-height:1.12;margin:8px 0 8px;letter-spacing:-.7px;max-width:700px}
+.control-hero p{margin:0;color:#d0dce8;font-size:13px;max-width:650px}
+.hero-bottom{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px;position:relative;z-index:1}
+.hero-bottom button{font-size:12px;font-weight:800}
+.hero-bottom .hero-light{background:var(--accent);color:#142033;border-color:var(--accent)}
+.hero-bottom .hero-dark{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.25)}
+.alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:17px}
+.alert-card{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid var(--line);border-radius:13px;background:var(--card);text-align:left;box-shadow:var(--shadow);width:100%}
+.alert-card .alert-symbol{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--bg);font-size:18px;flex-shrink:0}
+.alert-card strong{display:block;font-size:22px;line-height:1.1}.alert-card span{display:block;font-size:11px;color:var(--mute);font-weight:700;margin-top:4px}
+.alert-card.danger .alert-symbol{background:var(--redbg)}.alert-card.warning .alert-symbol{background:var(--ambbg)}.alert-card.good .alert-symbol{background:var(--grnbg)}
+.alert-card:hover{border-color:var(--accent)}
+.section-kicker{font-size:10px;color:var(--mute);font-weight:900;letter-spacing:.13em;text-transform:uppercase;margin:2px 0 10px}
+.overview-lower{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:16px;align-items:start}
+.mini-action-list{display:grid;gap:8px}
+.mini-action{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:11px;background:var(--card);text-align:left;width:100%;box-shadow:none}
+.mini-action .mini-icon{width:33px;height:33px;display:grid;place-items:center;border-radius:9px;background:var(--bg);font-size:15px}
+.mini-action b{display:block;font-size:12px}.mini-action small{display:block;color:var(--mute);font-size:10px}
+.empty-state{padding:20px;text-align:center;color:var(--mute);font-size:12px}
+@media(max-width:700px){.commandbar{grid-template-columns:1fr}.overview-lower{grid-template-columns:1fr}.search-results .result{grid-template-columns:70px minmax(0,1fr)}.search-results .result-go{display:none}.control-hero{padding:19px}.control-hero:after{right:-170px}}
+
+@media(max-width:700px){
+ header{top:0;padding:12px;gap:8px}header h1{font-size:16px;min-width:145px}
+ header h1:before{width:31px;height:31px;margin-right:7px}
+ header .who{font-size:11px}
+ nav{top:60px;padding-left:8px;padding-right:8px}
+ nav button{padding:11px 12px}
+ main{padding:10px}
+ .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .tile{padding:14px 12px;min-height:100px}
+ .tile b{font-size:27px}
+ .card{padding:13px;border-radius:13px}
+ th,td{padding:9px 7px;font-size:12px}
+ .bar{gap:7px}
+}
+@media(max-width:390px){.tiles{grid-template-columns:1fr 1fr}.tile b{font-size:24px}header h1{min-width:100%}}
+/* engineer holidays */
+.hgrid{border-collapse:separate;border-spacing:0;font-size:11px;min-width:100%}
+.hgrid th,.hgrid td{padding:0;text-align:center;border-bottom:1px solid var(--line);border-right:1px solid var(--line);height:34px;min-width:29px}
+.hgrid th{font-size:10px;line-height:1.2;padding:4px 0;border-radius:0;position:static}
+.hgrid th.who,.hgrid td.who{text-align:left;padding:0 10px;min-width:92px;position:sticky;left:0;z-index:2;font-weight:800;font-size:12px;background:var(--card)}
+.hgrid th.who{background:var(--bg)}
+.hgrid th.we,.hgrid td.we{background:var(--bg)}
+.hgrid th.bh,.hgrid td.bh{background:rgba(70,120,210,.22)}
+.hgrid td.ap{background:var(--green);color:#fff;font-weight:800}
+.hgrid td.pe{background:repeating-linear-gradient(45deg,var(--accent) 0 5px,transparent 5px 10px)}
+.hgrid td.half{background:linear-gradient(90deg,var(--green) 50%,transparent 50%)}
+.hgrid td.cl{box-shadow:inset 0 0 0 2px var(--red)}
+.hgrid th.today{box-shadow:inset 0 -3px 0 var(--accent);font-weight:900}
+.hgrid th.clash{color:var(--red);font-weight:900}
+.hkey{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--mute);margin-top:10px}
+.hkey i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-3px;margin-right:5px;border:1px solid var(--line)}
+tr.hsoon td{background:var(--ambbg)}
+@media print{
+ header,nav,.bar button,#refresh,#out,.commandbar,.search-results{display:none!important}
+ body{background:#fff;color:#111}
+ main{max-width:none;padding:0}
+ .card,.tile{box-shadow:none;break-inside:avoid;border-color:#bbb}
+}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 </head>
 <body>
 
@@ -57,6 +165,7 @@ details summary{cursor:pointer;color:var(--accent)}
   <input id="em" type="email" placeholder="Email" autocomplete="username">
   <input id="pw" type="password" placeholder="Password" autocomplete="current-password">
   <button class="primary" id="go">Sign in</button>
+  <button id="forgot" type="button" style="background:none;border:0;box-shadow:none;color:var(--accent-dark);font-size:12px;margin-top:4px">Forgot password?</button>
 </div>
 
 <div id="app" class="hide">
@@ -69,12 +178,29 @@ details summary{cursor:pointer;color:var(--accent)}
   </header>
   <nav id="tabs"></nav>
   <main>
+    <div class="commandbar">
+      <div class="command-search">
+        <span class="search-icon">⌕</span>
+        <input id="globalSearch" type="search" placeholder="Search jobs, customers, cranes, reports, purchase orders…" autocomplete="off" aria-label="Search all office records">
+        <span class="hint">SEARCH</span>
+      </div>
+      <div class="command-status">
+        <span class="status-dot"></span>
+        <div><b>KEY ENGINEERING CONTROL ROOM</b><span id="controlStatus">Live session · data status updates on refresh</span></div>
+      </div>
+    </div>
+    <div id="searchResults" class="search-results hide"></div>
     <div id="msg"></div>
     <section id="v-overview"></section>
+    <section id="v-today" class="hide"></section>
+    <section id="v-bookings" class="hide"></section>
     <section id="v-week" class="hide"></section>
     <section id="v-due" class="hide"></section>
     <section id="v-repairs" class="hide"></section>
     <section id="v-po" class="hide"></section>
+    <section id="v-folders" class="hide"></section>
+    <section id="v-hols" class="hide"></section>
+    <section id="v-portals" class="hide"></section>
   </main>
 </div>
 
@@ -99,6 +225,12 @@ const todayIso = () => iso(new Date());
 const store = { get(k){ try{ return JSON.parse(localStorage.getItem('ke_office_'+k)); }catch(e){ return null; } },
                 set(k,v){ try{ localStorage.setItem('ke_office_'+k, JSON.stringify(v)); }catch(e){} },
                 del(k){ try{ localStorage.removeItem('ke_office_'+k); }catch(e){} } };
+
+function csvDownload(name, header, rows){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const text=[header].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=name; a.click();
+}
 
 // ---------- auth + data ----------
 async function token(){
@@ -126,22 +258,34 @@ async function getAll(table, query){
   } return out;
 }
 
-let D = {jobs:[], reports:[], comps:{}, pos:[], profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
+let D = {bookings:[], people:[], phones:{}, mats:{}, jobs:[], reports:[], comps:{}, pos:[], folders:[], portals:[], hol:{staff:[],bank:[],allow:{},reqs:[],approvers:[]}, profile:null, jobsBlocked:false, posBlocked:false, loaded:null};
 
 async function load(){
   $('msg').innerHTML='';
   const problems=[];
-  const [jobs, reports, comps, pos, prof] = await Promise.all([
+  const [jobs, reports, comps, pos, prof, mats, bks, people, phones, folders, hStaff, hBank, hAllow, hReqs, hApp, portals] = await Promise.all([
     getAll('js_docs','select=id,data,updated_at&kind=eq.job&deleted=eq.false').catch(e=>{problems.push('Job sheets: '+e.message); return null;}),
     getAll('reports','select=id,report_no,customer,crane_no,id_no,visit_type,report_date,engineer,next_due,site,data,updated_at&order=report_date.desc').catch(e=>{problems.push('Reports: '+e.message); return [];}),
     getAll('completions','select=key,done_date,note').catch(e=>{problems.push('Completions: '+e.message); return [];}),
     getAll('po_requests','select=*&order=created_at.desc').catch(e=>{problems.push('Purchase orders: '+e.message); return [];}),
-    api('/rest/v1/profiles?select=name,role&id=eq.'+encodeURIComponent((store.get('session')||{}).uid||'')).then(r=>r.json()).catch(()=>[])
+    api('/rest/v1/profiles?select=name,role&id=eq.'+encodeURIComponent((store.get('session')||{}).uid||'')).then(r=>r.json()).catch(()=>[]),
+    getAll('office_materials','select=job_id,amount').catch(e=>{problems.push('Materials: '+e.message); return [];}),
+    getAll('bookings','select=*&order=created_at.desc').catch(e=>{problems.push('Bookings: '+e.message); return [];}),
+    getAll('profiles','select=id,name,role&order=name.asc').catch(()=>[]),
+    getAll('engineer_phones','select=user_id,phone').catch(()=>[]),
+    getAll('weekly_folders','select=*&order=week_ending.desc,engineer.asc').catch(e=>{problems.push('Weekly folders: '+e.message); return [];}),
+    getAll('holiday_staff','select=*&order=sort_order.asc').catch(e=>{problems.push('Holidays: '+e.message); return [];}),
+    getAll('bank_holidays','select=*&order=day.asc').catch(()=>[]),
+    getAll('holiday_allowances','select=*').catch(()=>[]),
+    getAll('holiday_requests','select=*&order=start_date.asc').catch(()=>[]),
+    getAll('holiday_approvers','select=user_id').catch(()=>[]),
+    getAll('customer_portals','select=*&order=customer.asc').catch(()=>[])
   ]);
   D.jobsBlocked = jobs === null; D.jobs = jobs || [];
-  D.reports = reports; D.profile = prof[0]||null;
+  D.portals = portals; D.hol = {staff:hStaff, bank:hBank, allow:{}, reqs:hReqs, approvers:hApp.map(a=>a.user_id)}; hAllow.forEach(a=>{ D.hol.allow[a.staff+'|'+a.year]=num(a.allowance); });
+  D.reports = reports; D.folders = folders; D.profile = prof[0]||null;
   D.comps = {}; comps.forEach(c=>D.comps[c.key]=c);
-  D.pos = pos; D.loaded = new Date();
+  D.pos = pos; D.bookings = bks; D.people = people; D.phones = {}; phones.forEach(x=>D.phones[x.user_id]=x.phone); D.mats = {}; mats.forEach(m=>D.mats[m.job_id]=num(m.amount)); D.loaded = new Date();
   if(problems.length) $('msg').innerHTML = '<div class="err">'+problems.map(esc).join('<br>')+'</div>';
   if(D.jobsBlocked) $('msg').innerHTML += '<div class="note">This login can\'t see job sheets. Add the office user to the Job Manager members list in Supabase (table <b>js_members</b>).</div>';
   $('synced').textContent = 'Updated '+D.loaded.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -170,10 +314,10 @@ function weekJobs(start){
     const engs=(d.engineers||[]).map(canon), n=Math.max(1,engs.length);
     let nt=0,ot=0,dt=0,mile=0;
     entries.forEach(t=>{ nt+=num(t.nt); ot+=num(t.ot); dt+=num(t.dt); mile+=num(t.mile); });
-    const labour = (nt*RATES.nt + ot*RATES.ot + dt*RATES.dt)*n, mileage = mile*RATES.mile, call = hasCallout?RATES.callout:0;
+    const labour = (nt*RATES.nt + ot*RATES.ot + dt*RATES.dt)*n, mileage = mile*RATES.mile, call = hasCallout?RATES.callout:0, mat = D.mats[j.id]||0;
     rows.push({id:j.id, job:d.job||j.id, customer:d.customerName||d.customer||'', site:d.site||'', type:d.type||'', status:d.status||'',
-      engs: engs.length?engs:['Unassigned'], n, nt,ot,dt,mile, labour, mileage, call, total:labour+mileage+call,
-      repairs:d.repairStatus||'', materials:(d.materials&&d.materials.length)||0});
+      engs: engs.length?engs:['Unassigned'], n, nt,ot,dt,mile, labour, mileage, call, mat, total:labour+mileage+call+mat,
+      repairs:d.repairStatus||'', notes:d.comments||'', defects:d.defects||'', materials:(d.materials&&d.materials.length)||0});
   });
   rows.sort((a,b)=> String(a.job).localeCompare(String(b.job)));
   return rows;
@@ -214,53 +358,283 @@ function repairsList(){
 }
 
 // ---------- views ----------
-let weekStart = monday(todayIso()), dueWin = 30, dueEng = '', dueKind = '', tab = 'overview';
+let invMode = false, weekStart = monday(todayIso()), dueWin = 30, dueEng = '', dueKind = '', tab = 'overview', foldersWeek = '';
 
 function pill(days){ return days<0?`<span class="pill red">OVERDUE ${-days}d</span>`: days===0?'<span class="pill red">TODAY</span>': days<=7?`<span class="pill amber">${days}d</span>`:`<span class="pill grey">${days}d</span>`; }
 
 function viewOverview(){
   const due=dueList(), rep=repairsList(), jobs=weekJobs(monday(todayIso()));
-  const over=due.filter(d=>d.days<0).length, soon=due.filter(d=>d.days>=0&&d.days<=30).length;
+  const over=due.filter(d=>d.days<0).length, due7=due.filter(d=>d.days>=0&&d.days<=7).length;
+  const soon=due.filter(d=>d.days>=0&&d.days<=30).length;
   const urgent=rep.open.filter(x=>x.it.status==='URGENT').length;
   const wkTotal=jobs.reduce((s,j)=>s+j.total,0);
   const pending=D.pos.filter(p=>p.status==='pending').length;
   const engs={}; due.filter(d=>d.days<=30).forEach(d=>{ (engs[d.eng]=engs[d.eng]||{o:0,s:0}); d.days<0?engs[d.eng].o++:engs[d.eng].s++; });
+  const today=new Date();
+  const greeting=today.getHours()<12?'Good morning':today.getHours()<17?'Good afternoon':'Good evening';
+  const hs=holSummary();
+  const alertTotal=over+due7+urgent+pending+hs.clashes.length+hs.pending;
   $('v-overview').innerHTML = `
-  <div class="tiles">
-    <div class="tile ${over?'red':''}"><b>${over}</b><span>Overdue services / inspections</span></div>
-    <div class="tile ${soon?'amber':''}"><b>${soon}</b><span>Due in next 30 days</span></div>
-    <div class="tile ${rep.open.length?'red':'green'}"><b>${rep.open.length}</b><span>Repairs outstanding (${urgent} urgent)</span></div>
-    <div class="tile"><b>${jobs.length}</b><span>Jobs this week (${gbp(wkTotal)})</span></div>
-    <div class="tile ${pending?'amber':''}"><b>${pending}</b><span>POs awaiting approval</span></div>
+  <div class="control-hero">
+    <div class="eyebrow">Key Engineering · Operations</div>
+    <h2>${greeting}. Here's your control room.</h2>
+    <p>One place to keep an eye on jobs, inspections, repairs and purchase orders. Start with the priority alerts, then drill into the detail below.</p>
+    <div class="hero-bottom">
+      <button class="hero-light" id="heroDue">Review inspections due</button>
+      <button class="hero-dark" id="heroRepairs">View repairs queue</button>
+      <button class="hero-dark" id="heroWeek">Open weekly jobs</button>
+      <button class="hero-dark" id="heroPO">Purchase orders</button>
+    </div>
   </div>
-  <div class="card"><h2>Upcoming by engineer <span class="mute small">next 30 days + overdue</span></h2>
-  ${Object.keys(engs).length?`<div class="wrap"><table><tr><th>Engineer</th><th class="r">Overdue</th><th class="r">Due in 30 days</th></tr>${Object.keys(engs).sort().map(e=>`<tr><td>${esc(e)}</td><td class="r">${engs[e].o?`<span class="pill red">${engs[e].o}</span>`:'–'}</td><td class="r">${engs[e].s||'–'}</td></tr>`).join('')}</table></div>`:'<p class="mute">Nothing due. Services and inspections only appear here once a report has a next-due date.</p>'}
+  <div class="section-kicker">Priority alerts · ${alertTotal} items to check</div>
+  <div class="alert-grid">
+    <button class="alert-card ${over?'danger':'good'}" id="alertOverdue"><span class="alert-symbol">⚠</span><span><strong>${over}</strong><span>Overdue inspections</span></span></button>
+    <button class="alert-card ${due7?'warning':'good'}" id="alertDue7"><span class="alert-symbol">◷</span><span><strong>${due7}</strong><span>Due within 7 days</span></span></button>
+    <button class="alert-card ${urgent?'danger':'good'}" id="alertUrgent"><span class="alert-symbol">🔧</span><span><strong>${urgent}</strong><span>Urgent repairs</span></span></button>
+    <button class="alert-card ${pending?'warning':'good'}" id="alertPO"><span class="alert-symbol">▤</span><span><strong>${pending}</strong><span>POs awaiting approval</span></span></button>
+    <button class="alert-card ${hs.clashes.length?'danger':'good'}" id="alertClash"><span class="alert-symbol">🏖</span><span><strong>${hs.clashes.length}</strong><span>Holiday clashes (next 90 days)</span></span></button>
+    <button class="alert-card ${hs.starting.length||hs.pending?'warning':'good'}" id="alertHol"><span class="alert-symbol">📅</span><span><strong>${hs.starting.length}</strong><span>Holidays starting within 14 days${hs.pending?' · '+hs.pending+' to approve':''}</span></span></button>
+  </div>
+  <div class="tiles">
+    <div class="tile ${soon?'amber':''}"><b>${soon}</b><span>Due in next 30 days</span></div>
+    <div class="tile ${rep.open.length?'red':'green'}"><b>${rep.open.length}</b><span>Repairs outstanding</span></div>
+    <div class="tile"><b>${jobs.length}</b><span>Jobs this week</span></div>
+    <div class="tile"><b>${gbp(wkTotal)}</b><span>Estimated weekly labour + mileage + call-outs</span></div>
+    <div class="tile"><b>${D.reports.length}</b><span>Reports loaded</span></div>
+  </div>
+  <div class="overview-lower">
+    <div class="card"><h2>Upcoming by engineer <span class="mute small">Overdue + next 30 days</span></h2>
+    ${Object.keys(engs).length?`<div class="wrap"><table><thead><tr><th>Engineer</th><th class="r">Overdue</th><th class="r">Due in 30 days</th></tr></thead><tbody>${Object.keys(engs).sort().map(e=>`<tr><td>${esc(e)}</td><td class="r">${engs[e].o?`<span class="pill red">${engs[e].o}</span>`:'–'}</td><td class="r">${engs[e].s||'–'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state">No due dates found in the loaded reports. Equipment only appears here when a report has a next-due date.</div>'}
+    </div>
+    <div class="card"><h2>Quick actions</h2>
+      <div class="mini-action-list">
+        <button class="mini-action" id="quickDue"><span class="mini-icon">📅</span><span><b>Inspection planner</b><small>Services, inspections and LOLER due dates</small></span></button>
+        <button class="mini-action" id="quickRepairs"><span class="mini-icon">🛠</span><span><b>Repairs queue</b><small>Outstanding and recently completed repairs</small></span></button>
+        <button class="mini-action" id="quickWeek"><span class="mini-icon">👷</span><span><b>Weekly engineer jobs</b><small>Hours, mileage and estimated totals</small></span></button>
+        <button class="mini-action" id="quickPO"><span class="mini-icon">🧾</span><span><b>Purchase orders</b><small>Review requests and approval status</small></span></button>
+      </div>
+      <p class="mute small" style="margin:12px 0 0">Last data refresh: ${D.loaded?D.loaded.toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}):'Not yet loaded'}</p>
+    </div>
   </div>`;
+  const go = k => { tab=k; store.set('tab',tab); render(); window.scrollTo({top:0,behavior:'smooth'}); };
+  [['heroDue','due'],['alertOverdue','due'],['alertDue7','due'],['quickDue','due'],
+   ['heroRepairs','repairs'],['alertUrgent','repairs'],['quickRepairs','repairs'],
+   ['heroWeek','week'],['quickWeek','week'],['heroPO','po'],['alertPO','po'],['quickPO','po'],['alertClash','hols'],['alertHol','hols']]
+   .forEach(([id,k])=>{const el=$(id); if(el) el.onclick=()=>{if(k==='due'){dueWin=id==='alertOverdue'?365:id==='alertDue7'?7:dueWin;} go(k);};});
 }
-
-function viewWeek(){
+async function saveMat(i){
+  const v=Math.max(0,num(i.value)); i.disabled=true;
+  try{
+    await api('/rest/v1/office_materials?on_conflict=job_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({job_id:i.dataset.job,amount:v})});
+    D.mats[i.dataset.job]=v;
+  }catch(e){ $('msg').innerHTML='<div class="err">Could not save materials: '+esc(e.message)+'</div>'; }
+  viewWeek();
+}
+function bindMats(){ document.querySelectorAll('#v-week input.mat').forEach(i=>i.onchange=()=>saveMat(i)); }
+const matInput = j => `<input class="mat" data-job="${esc(j.id)}" type="number" min="0" step="0.01" value="${j.mat||''}" placeholder="0.00" style="width:84px;text-align:right;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px">`;
+function dailyData(){
+  const due=dueList().filter(d=>d.days<=14), rep=repairsList(), canon=nameMap();
+  const dow=new Date().getDay(), since=addDays(todayIso(), dow===1?-3:-1);
+  return {
+    due,
+    urgent:rep.open.filter(x=>x.it.status==='URGENT'),
+    attn:rep.open.filter(x=>x.it.status!=='URGENT').length,
+    done:D.reports.filter(r=>(r.report_date||'')>=since&&(r.report_date||'')<todayIso()),
+    pend:D.pos.filter(p=>p.status==='pending'),
+    prog:D.jobs.filter(j=>(j.data||{}).status==='In Progress'),
+    since, canon
+  };
+}
+function viewToday(){
+  const d=dailyData(), t=new Date();
+  const dateLabel=t.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const over=d.due.filter(x=>x.days<0).length;
+  const sec=(title,count,body)=>`<div class="card"><h2>${title} <span class="mute small">${count}</span></h2><div class="wrap">${body}</div></div>`;
+  const none=m=>`<span class="mute">${m}</span>`;
+  const engs=[...new Set(d.due.map(x=>x.eng))].sort();
+  const dueBody=d.due.length?engs.map(e=>`<p style="font-weight:700;margin:12px 0 4px">${esc(e)}</p><table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th></tr>${d.due.filter(x=>x.eng===e).map(x=>`<tr><td>${uk(x.iso)}</td><td>${pill(x.days)}</td><td>${esc(x.kind)}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td></tr>`).join('')}</table>`).join(''):none('Nothing overdue or due in the next 14 days.');
+  const urgBody=d.urgent.length?`<table><tr><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${d.urgent.map(x=>`<tr><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`).join('')}</table>`+(d.attn?`<p class="small mute">Plus ${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:''):none('No urgent repairs outstanding.')+(d.attn?`<p class="small mute">${d.attn} "requires attention" repair${d.attn===1?'':'s'} waiting to be booked in (see Repairs tab).</p>`:'');
+  const poBody=d.pend.length?`<table><tr><th>Engineer</th><th>Site / ref</th><th>Description</th><th class="r">Est.</th></tr>${d.pend.map(p=>`<tr><td>${esc(p.engineer_name)}</td><td>${esc(p.site_ref)}</td><td>${esc(p.description)}</td><td class="r">${esc(p.est_value||'')}</td></tr>`).join('')}</table>`:none('None waiting.');
+  const doneBody=d.done.length?`<table><tr><th>Date</th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Defects</th></tr>${d.done.map(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean),u=it.filter(i=>i.status==='URGENT').length,a=it.filter(i=>i.status==='ATTN').length;return `<tr><td>${uk(r.report_date)}</td><td>${esc(r.visit_type||'Service')}</td><td>${esc(r.customer)}</td><td>${esc(r.crane_no||'')}</td><td>${esc(d.canon(r.engineer))}</td><td>${u?`<span class="pill red">${u} urgent</span> `:''}${a?`<span class="pill amber">${a} attn</span>`:''}${u||a?'':'none'}</td></tr>`;}).join('')}</table>`:none('No services or inspections completed.');
+  const progBody=d.prog.length?`<table><tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Engineers</th></tr>${d.prog.map(j=>{const x=j.data;return `<tr><td>${esc(x.job||j.id)}</td><td>${esc(x.customerName||x.customer||'')}<div class="mute small">${esc(x.site||'')}</div></td><td>${esc(x.type||'')}</td><td>${esc((x.engineers||[]).map(d.canon).join(', '))}</td></tr>`;}).join('')}</table>`:none('No jobs in progress.');
+  $('v-today').innerHTML=`<div class="bar"><b>${esc(dateLabel)}</b><span class="mute small">${over} overdue · ${d.due.length-over} due in 14 days · ${d.urgent.length} urgent repairs · ${d.pend.length} POs waiting</span><span class="sp"></span><button class="primary" id="tCsv">Download today's list</button><button id="tPrint">Print</button></div>`+
+    sec('Services, inspections &amp; LOLER — overdue and next 14 days',d.due.length,dueBody)+
+    sec('Urgent repairs outstanding',d.urgent.length,urgBody)+
+    sec('Purchase orders awaiting approval',d.pend.length,poBody)+
+    sec('Completed since '+(new Date().getDay()===1?'Friday':'yesterday'),d.done.length,doneBody)+
+    sec('Bookings waiting to be issued',D.bookings.filter(b=>b.status==='booked').length,(()=>{const bk=D.bookings.filter(b=>b.status==='booked');return bk.length?`<table><tr><th>Customer / site</th><th>Job</th><th>Wanted</th><th>Priority</th></tr>${bk.map(b=>`<tr><td>${esc(b.customer)}<div class="mute small">${esc(b.site||'')}</div></td><td>${esc(b.job_type||'')}<div class="mute small">${esc(b.description)}</div></td><td>${b.wanted_date?uk(b.wanted_date):''}</td><td>${b.priority==='Urgent'?'<span class="pill red">URGENT</span>':'Normal'}</td></tr>`).join('')}</table>`:none('No bookings waiting.');})())+
+    sec('Jobs in progress',d.prog.length,progBody);
+  $('tPrint').onclick=()=>window.print();
+  $('tCsv').onclick=()=>{
+    const rows=[];
+    d.due.forEach(x=>rows.push(['Due / overdue',uk(x.iso),x.days<0?'OVERDUE '+(-x.days)+' days':x.days===0?'Today':'In '+x.days+' days',x.kind,x.r.customer,x.r.site,x.r.crane_no,x.eng,'']));
+    d.urgent.forEach(x=>rows.push(['Urgent repair',uk(x.r.report_date),'Urgent','',x.r.customer,x.r.site,x.r.crane_no,x.eng,(x.it.group||'')+' - '+x.it.label+(x.it.note?': '+x.it.note:'')]));
+    d.pend.forEach(p=>rows.push(['PO awaiting approval',uk((p.created_at||'').slice(0,10)),'Pending','','',p.site_ref,'',p.engineer_name,p.description+(p.est_value?' ('+p.est_value+')':'')]));
+    d.done.forEach(r=>{const it=((r.data&&r.data.items)||[]).filter(Boolean);rows.push(['Completed',uk(r.report_date),'Done',r.visit_type||'Service',r.customer,r.site,r.crane_no,d.canon(r.engineer),it.filter(i=>i.status==='URGENT').length+' urgent, '+it.filter(i=>i.status==='ATTN').length+' attn']);});
+    D.bookings.filter(b=>b.status==='booked').forEach(b=>rows.push(['Booking to issue',b.wanted_date?uk(b.wanted_date):'',b.priority,b.job_type||'',b.customer,b.site,'','',b.description]));
+    d.prog.forEach(j=>{const x=j.data;rows.push(['Job in progress',uk(x.date),'In progress',x.type,x.customerName||x.customer,x.site,'',(x.engineers||[]).map(d.canon).join(' + '),'Job '+(x.job||j.id)]);});
+    csvDownload('todays_list_'+todayIso()+'.csv',['Section','Date','Status','Type','Customer','Site','Crane','Engineer','Details'],rows);
+  };
+}
+const cap = n => String(n||'').replace(/^./,c=>c.toUpperCase());
+const JOB_TYPES = ['Service','Inspection','LOLER','Repair','Breakdown / call-out','Installation','Quote visit','Other'];
+async function patchBooking(id, fields){
+  await api('/rest/v1/bookings?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(fields)});
+}
+async function notifyEngineer(id){
+  const res=await fetch(SB.url+'/functions/v1/push-send',{method:'POST',headers:{apikey:SB.key,Authorization:'Bearer '+await token(),'Content-Type':'application/json'},body:JSON.stringify({action:'send',booking_id:id})});
+  const j=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(j.error||('Notification failed ('+res.status+')'));
+  return j;
+}
+function bookingText(b){
+  return ['New job from Key Engineering'+(b.priority==='Urgent'?' - URGENT':''),
+    b.customer, b.site||'', b.contact?('Contact: '+b.contact+(b.phone?' '+b.phone:'')):(b.phone?'Phone: '+b.phone:''),
+    (b.job_type||'')+(b.wanted_date?' - wanted '+uk(b.wanted_date):''), b.description].filter(Boolean).join('\n');
+}
+async function issueBooking(b, engId){
+  const person=D.people.find(x=>x.id===engId);
+  if(!person) throw new Error('Choose an engineer first');
+  await patchBooking(b.id,{engineer_id:engId,engineer_name:cap(person.name),status:'issued',issued_at:new Date().toISOString()});
+  let note='';
+  try{
+    const r=await notifyEngineer(b.id);
+    note = r.sent ? `Issued to ${cap(person.name)} and their phone has been notified.` : r.devices ? `Issued to ${cap(person.name)}, but the notification could not be delivered — use the Text button.` : `Issued to ${cap(person.name)}. They haven't switched on phone notifications yet — use the Text button.`;
+  }catch(e){ note=`Issued to ${cap(person.name)}, but the notification failed (${e.message}) — use the Text button.`; }
+  return note;
+}
+async function textEngineer(b){
+  let num=D.phones[b.engineer_id];
+  if(!num){
+    num=(window.prompt('Mobile number for '+(b.engineer_name||'this engineer')+':')||'').replace(/[^0-9+]/g,'');
+    if(!num) return;
+    await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:b.engineer_id,phone:num})});
+    D.phones[b.engineer_id]=num;
+  }
+  window.location.href='sms:'+num+'?&body='+encodeURIComponent(bookingText(b));
+}
+function viewBookings(){
+  const people=D.people, opt=(sel)=>people.map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc(cap(x.name))}</option>`).join('');
+  const open=D.bookings.filter(b=>b.status==='booked');
+  const out=D.bookings.filter(b=>b.status==='issued'||b.status==='accepted');
+  const cutoff=addDays(todayIso(),-7);
+  const done=D.bookings.filter(b=>b.status==='done'&&(b.done_at||'').slice(0,10)>=cutoff);
+  const card=(b,mode)=>`<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--card)">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between"><b>${esc(b.customer)}</b><span>${b.priority==='Urgent'?'<span class="pill red">URGENT</span> ':''}<span class="pill ${b.status==='done'?'green':b.status==='accepted'?'green':b.status==='issued'?'amber':'grey'}">${esc(b.status)}</span></span></div>
+    <div class="mute small">${esc([b.site,b.job_type,b.wanted_date?'wanted '+uk(b.wanted_date):''].filter(Boolean).join(' · '))}</div>
+    <div class="small" style="margin:6px 0">${esc(b.description)}</div>
+    <div class="mute small">${b.contact||b.phone?'Contact: '+esc([b.contact,b.phone].filter(Boolean).join(' · '))+' · ':''}Booked ${uk((b.created_at||'').slice(0,10))}${b.engineer_name?' · Engineer: '+esc(b.engineer_name):''}${b.accepted_at?' · Accepted '+uk(b.accepted_at.slice(0,10)):''}</div>
+    <div class="bar" style="margin:10px 0 0;padding:8px;box-shadow:none">
+    ${mode==='open'?`<select data-eng="${esc(b.id)}"><option value="">Choose engineer…</option>${opt(b.engineer_id)}</select><button class="primary" data-act="issue" data-id="${esc(b.id)}">Issue</button>`:''}
+    ${mode==='out'?`<button data-act="text" data-id="${esc(b.id)}">Text</button><button data-act="notify" data-id="${esc(b.id)}">Notify again</button><button data-act="done" data-id="${esc(b.id)}">Mark done</button>`:''}
+    ${mode==='done'?`<button data-act="text" data-id="${esc(b.id)}">Text</button>`:''}
+    <span class="sp"></span>${mode!=='done'?`<button data-act="cancel" data-id="${esc(b.id)}">Cancel booking</button>`:''}</div></div>`;
+  $('v-bookings').innerHTML=`<div class="card"><h2>New booking <span class="mute small">customer rings the office</span></h2>
+    <form id="bkForm"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+      <label class="small">Customer *<input name="customer" required class="fld"></label>
+      <label class="small">Site / address<input name="site" class="fld"></label>
+      <label class="small">Contact name<input name="contact" class="fld"></label>
+      <label class="small">Contact phone<input name="phone" type="tel" class="fld"></label>
+      <label class="small">Type of job<select name="job_type" class="fld">${JOB_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></label>
+      <label class="small">Priority<select name="priority" class="fld"><option>Normal</option><option>Urgent</option></select></label>
+      <label class="small">Date wanted<input name="wanted_date" type="date" class="fld"></label>
+      <label class="small">Engineer (optional)<select name="engineer" class="fld"><option value="">Decide later</option>${opt('')}</select></label>
+    </div>
+    <label class="small" style="display:block;margin-top:10px">What needs doing *<textarea name="description" required rows="3" class="fld" style="width:100%"></textarea></label>
+    <div class="bar" style="margin:12px 0 0;padding:0;border:0;box-shadow:none"><button class="primary" type="submit" data-issue="0">Save booking</button><button type="submit" data-issue="1">Save &amp; issue to engineer</button><span class="mute small" id="bkMsg"></span></div></form></div>
+    <div class="card"><h2>Waiting to be issued <span class="mute small">${open.length}</span></h2>${open.length?open.map(b=>card(b,'open')).join(''):'<span class="mute">No bookings waiting.</span>'}</div>
+    <div class="card"><h2>Out with engineers <span class="mute small">${out.length}</span></h2>${out.length?out.map(b=>card(b,'out')).join(''):'<span class="mute">Nothing issued at the moment.</span>'}</div>
+    <div class="card"><h2>Done in the last 7 days <span class="mute small">${done.length}</span></h2>${done.length?done.map(b=>card(b,'done')).join(''):'<span class="mute">None.</span>'}</div>
+    <div class="card"><details><summary>Engineer mobile numbers (for the Text button)</summary><div class="wrap" style="margin-top:10px"><table>${people.map(x=>`<tr><td>${esc(cap(x.name))}</td><td><input class="fld" data-phone="${esc(x.id)}" type="tel" value="${esc(D.phones[x.id]||'')}" placeholder="07…"></td></tr>`).join('')}</table></div></details></div>`;
+  document.querySelectorAll('#v-bookings .fld').forEach(el=>{el.style.cssText+=';width:100%;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit;box-sizing:border-box';});
+  const say=(m,err)=>{$('msg').innerHTML=`<div class="${err?'err':'note'}">${esc(m)}</div>`;window.scrollTo({top:0,behavior:'smooth'});};
+  let wantIssue=false;
+  $('bkForm').querySelectorAll('button[type=submit]').forEach(b=>b.onclick=()=>{wantIssue=b.dataset.issue==='1';});
+  $('bkForm').onsubmit=async e=>{
+    e.preventDefault();
+    const f=new FormData($('bkForm')), v=k=>String(f.get(k)||'').trim();
+    const eng=v('engineer');
+    if(wantIssue&&!eng){ say('Choose an engineer to issue it to, or use Save booking.',true); return; }
+    $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=true);
+    try{
+      const res=await api('/rest/v1/bookings',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify({customer:v('customer'),site:v('site')||null,contact:v('contact')||null,phone:v('phone')||null,job_type:v('job_type'),priority:v('priority'),wanted_date:v('wanted_date')||null,description:v('description')})});
+      const made=(await res.json())[0];
+      let msg='Booking saved.';
+      if(wantIssue&&made) msg=await issueBooking(made,eng);
+      else if(eng&&made){ const pe=D.people.find(x=>x.id===eng); await patchBooking(made.id,{engineer_id:eng,engineer_name:cap(pe&&pe.name)}); }
+      await load(); render(); say(msg,false);
+    }catch(err){ say('Could not save: '+err.message,true); $('bkForm').querySelectorAll('button').forEach(b=>b.disabled=false); }
+  };
+  $('v-bookings').querySelectorAll('button[data-act]').forEach(btn=>btn.onclick=async()=>{
+    const b=D.bookings.find(x=>x.id===btn.dataset.id); if(!b) return;
+    btn.disabled=true;
+    try{
+      const act=btn.dataset.act;
+      if(act==='issue'){ const eng=document.querySelector(`select[data-eng="${b.id}"]`).value; const msg=await issueBooking(b,eng); await load(); render(); say(msg,false); return; }
+      if(act==='text'){ await textEngineer(b); btn.disabled=false; render(); return; }
+      if(act==='notify'){ const r=await notifyEngineer(b.id); say(r.sent?'Notification sent.':r.devices?'The notification could not be delivered — use the Text button.':'That engineer has not switched on phone notifications yet — use the Text button.',!r.sent); btn.disabled=false; return; }
+      if(act==='done'){ await patchBooking(b.id,{status:'done',done_at:new Date().toISOString()}); }
+      if(act==='cancel'){ if(!confirm('Cancel this booking?')){btn.disabled=false;return;} await patchBooking(b.id,{status:'cancelled'}); }
+      await load(); render();
+    }catch(err){ say(err.message,true); btn.disabled=false; }
+  });
+  $('v-bookings').querySelectorAll('input[data-phone]').forEach(i=>i.onchange=async()=>{
+    const num=i.value.replace(/[^0-9+]/g,'');
+    try{ await api('/rest/v1/engineer_phones?on_conflict=user_id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:i.dataset.phone,phone:num})}); D.phones[i.dataset.phone]=num; i.value=num; say('Number saved.',false); }
+    catch(err){ say('Could not save number: '+err.message,true); }
+  });
+}
+function viewWeek(){ if(invMode) viewInvoice(); else viewWeekEngineers(); }
+function hrsText(j){ return [j.nt?j.nt+' normal':'',j.ot?j.ot+' OT1':'',j.dt?j.dt+' OT2':''].filter(Boolean).join(', ')+(j.n>1?' × '+j.n+' engineers':''); }
+function viewInvoice(){
+  const rows=weekJobs(weekStart), by={};
+  rows.forEach(j=>{ const c=j.customer||'Customer not set'; (by[c]=by[c]||[]).push(j); });
+  const tot=rows.reduce((s,j)=>s+j.total,0);
+  let html=`<div class="bar"><button id="iPrev">◀</button><b>Invoice worksheet · week starting ${uk(weekStart)}</b><button id="iNext">▶</button><button id="iNow">This week</button><span class="sp"></span><button id="iBack">Back to engineers</button><button id="iPrint">Print</button></div>
+  <div class="note">One line per job. Labour = hours × rate × number of engineers; mileage once per job. Type materials into each job — they are saved for the whole office.</div>
+  <div class="tiles"><div class="tile"><b>${Object.keys(by).length}</b><span>Customers to invoice</span></div><div class="tile"><b>${gbp(tot)}</b><span>Total to invoice</span></div></div>`;
+  if(!rows.length) html+='<div class="card mute">No job sheets with time booked in this week.</div>';
+  Object.keys(by).sort().forEach(c=>{
+    const js=by[c], ct=js.reduce((s,j)=>s+j.total,0);
+    html+=`<div class="card"><h2>${esc(c)} <span>${gbp(ct)}</span></h2><div class="wrap"><table>
+    <tr><th>Job</th><th>Site / type</th><th>Engineers</th><th>Work carried out</th><th class="r">Labour</th><th class="r">Mileage</th><th class="r">Call-out</th><th class="r">Materials £</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.site)}<div class="mute small">${esc(j.type)}</div></td><td>${esc(j.engs.join(', '))}</td><td style="white-space:pre-wrap;min-width:200px;max-width:340px">${esc(j.notes)}${j.defects?`<div class="mute small">Follow-up: ${esc(j.defects)}</div>`:''}</td><td class="r">${gbp(j.labour)}<div class="mute small">${esc(hrsText(j))}</div></td><td class="r">${gbp(j.mileage)}<div class="mute small">${j.mile?j.mile+' miles':''}</div></td><td class="r">${j.call?gbp(j.call):''}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    </table></div></div>`;
+  });
+  $('v-week').innerHTML=html;
+  $('iPrev').onclick=()=>{weekStart=addDays(weekStart,-7);viewWeek();};
+  $('iNext').onclick=()=>{weekStart=addDays(weekStart,7);viewWeek();};
+  $('iNow').onclick=()=>{weekStart=monday(todayIso());viewWeek();};
+  $('iBack').onclick=()=>{invMode=false;viewWeek();};
+  $('iPrint').onclick=()=>window.print();
+  bindMats();
+}
+function viewWeekEngineers(){
   const rows=weekJobs(weekStart), by={};
   rows.forEach(j=> j.engs.forEach(e=>{ (by[e]=by[e]||[]).push(j); }));
   const tot=rows.reduce((s,j)=>s+j.total,0);
-  let html=`<div class="bar"><button id="wPrev">◀</button><b>Week starting ${uk(weekStart)}</b> <span class="mute small">to ${uk(addDays(weekStart,6))}</span><button id="wNext">▶</button><button id="wNow">This week</button><span class="sp"></span><button id="wCsv" ${rows.length?'':'disabled'}>Download CSV</button></div>
-  <div class="note">Costed at normal £50, OT1 £64, OT2 £73 per hour (× number of engineers named), £100 call-out, £0.70/mile. Materials still need adding by the office. Mileage is counted once per job, not per engineer.</div>
-  <div class="tiles"><div class="tile"><b>${rows.length}</b><span>Jobs</span></div><div class="tile"><b>${gbp(tot)}</b><span>Labour + mileage + call-outs</span></div><div class="tile"><b>${Object.keys(by).length}</b><span>Engineers working</span></div></div>`;
+  let html=`<div class="bar"><button id="wPrev">◀</button><b>Week starting ${uk(weekStart)}</b> <span class="mute small">to ${uk(addDays(weekStart,6))}</span><button id="wNext">▶</button><button id="wNow">This week</button><span class="sp"></span><button id="wCsv" ${rows.length?'':'disabled'}>Download CSV</button><button id="wInv" class="primary">Invoice worksheet</button><button id="wPrint">Print</button></div>
+  <div class="note">Costed at normal £50, OT1 £64, OT2 £73 per hour (× number of engineers named), £100 call-out, £0.70/mile. Type materials into the box on each job; they are saved for the whole office. Mileage is counted once per job, not per engineer.</div>
+  <div class="tiles"><div class="tile"><b>${rows.length}</b><span>Jobs</span></div><div class="tile"><b>${gbp(tot)}</b><span>Labour + mileage + call-outs + materials</span></div><div class="tile"><b>${Object.keys(by).length}</b><span>Engineers working</span></div></div>`;
   if(!rows.length) html+='<div class="card mute">No job sheets with time booked in this week.</div>';
   Object.keys(by).sort().forEach(e=>{
     const js=by[e];
     html+=`<div class="card"><h2>${esc(e)} <span class="mute small">${js.length} job${js.length===1?'':'s'}</span></h2><div class="wrap"><table>
-    <tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Status</th><th class="r">Normal</th><th class="r">OT1</th><th class="r">OT2</th><th class="r">Miles</th><th class="r">Crew</th><th class="r">Total</th></tr>
-    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.customer)}<div class="mute small">${esc(j.site)}</div></td><td>${esc(j.type)}</td><td><span class="pill ${j.status==='Complete'?'green':'amber'}">${esc(j.status||'–')}</span>${j.repairs&&j.repairs!=='Done'?`<div class="small mute">Repairs: ${esc(j.repairs)}</div>`:''}</td><td class="r">${j.nt||''}</td><td class="r">${j.ot||''}</td><td class="r">${j.dt||''}</td><td class="r">${j.mile||''}</td><td class="r">${j.n}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
+    <tr><th>Job</th><th>Customer / site</th><th>Type</th><th>Status</th><th class="r">Normal</th><th class="r">OT1</th><th class="r">OT2</th><th class="r">Miles</th><th class="r">Crew</th><th class="r">Materials £</th><th class="r">Total</th></tr>
+    ${js.map(j=>`<tr><td>${esc(j.job)}</td><td>${esc(j.customer)}<div class="mute small">${esc(j.site)}</div></td><td>${esc(j.type)}</td><td><span class="pill ${j.status==='Complete'?'green':'amber'}">${esc(j.status||'–')}</span>${j.repairs&&j.repairs!=='Done'?`<div class="small mute">Repairs: ${esc(j.repairs)}</div>`:''}</td><td class="r">${j.nt||''}</td><td class="r">${j.ot||''}</td><td class="r">${j.dt||''}</td><td class="r">${j.mile||''}</td><td class="r">${j.n}</td><td class="r">${matInput(j)}</td><td class="r">${gbp(j.total)}</td></tr>`).join('')}
     </table></div></div>`;
   });
   $('v-week').innerHTML=html;
   $('wPrev').onclick=()=>{weekStart=addDays(weekStart,-7);viewWeek();};
   $('wNext').onclick=()=>{weekStart=addDays(weekStart,7);viewWeek();};
   $('wNow').onclick=()=>{weekStart=monday(todayIso());viewWeek();};
+  $('wPrint').onclick=()=>window.print();
+  $('wInv').onclick=()=>{invMode=true;viewWeek();};
+  bindMats();
   $('wCsv').onclick=()=>{
     const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
-    const lines=[['Engineer','Job','Customer','Site','Type','Status','Normal hrs','OT1 hrs','OT2 hrs','Crew','Miles','Labour','Mileage','Call-out','Total'].map(q).join(',')];
-    rows.forEach(j=>j.engs.forEach(e=>lines.push([e,j.job,j.customer,j.site,j.type,j.status,j.nt,j.ot,j.dt,j.n,j.mile,j.labour.toFixed(2),j.mileage.toFixed(2),j.call.toFixed(2),j.total.toFixed(2)].map(q).join(','))));
+    const lines=[['Engineers','Job','Customer','Site','Type','Status','Normal hrs','OT1 hrs','OT2 hrs','Crew','Miles','Labour','Mileage','Call-out','Materials','Total'].map(q).join(',')];
+    rows.forEach(j=>[j.engs.join(' + ')].forEach(e=>lines.push([e,j.job,j.customer,j.site,j.type,j.status,j.nt,j.ot,j.dt,j.n,j.mile,j.labour.toFixed(2),j.mileage.toFixed(2),j.call.toFixed(2),j.mat.toFixed(2),j.total.toFixed(2)].map(q).join(','))));
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines.join('\r\n')],{type:'text/csv'})); a.download='jobs_week_'+weekStart+'.csv'; a.click();
   };
 }
@@ -272,9 +646,10 @@ function viewDue(){
     <select id="dEng"><option value="">All engineers</option>${engs.map(e=>`<option ${e===dueEng?'selected':''}>${esc(e)}</option>`).join('')}</select>
     <select id="dKind"><option value="">Service / Inspection / LOLER</option>${Object.keys(KINDS).map(k=>`<option ${k===dueKind?'selected':''}>${k}</option>`).join('')}</select>
     <select id="dWin">${[7,30,60,90,365].map(n=>`<option value="${n}" ${n===dueWin?'selected':''}>Next ${n} days</option>`).join('')}</select>
-    <span class="mute small">${list.length} shown</span></div>
+    <span class="mute small">${list.length} shown</span><span class="sp"></span><button id="dCsv" ${list.length?'':'disabled'}>Download CSV</button></div>
     <div class="card wrap">${list.length?`<table><tr><th>Due</th><th></th><th>Type</th><th>Customer</th><th>Crane</th><th>Engineer</th><th>Last visit</th></tr>
     ${list.map(d=>`<tr><td>${uk(d.iso)}</td><td>${pill(d.days)}</td><td>${esc(d.kind)}</td><td>${esc(d.r.customer)}<div class="mute small">${esc(d.r.site||'')}</div></td><td>${esc(d.r.crane_no||'')}${d.r.id_no?` <span class="mute small">ID ${esc(d.r.id_no)}</span>`:''}</td><td>${esc(d.eng)}</td><td>${uk(d.r.report_date)}</td></tr>`).join('')}</table>`:'<span class="mute">Nothing due in this window.</span>'}</div>`;
+  $('dCsv').onclick=()=>csvDownload('due_'+todayIso()+'.csv',['Due','Days','Type','Customer','Site','Crane','ID','Engineer','Last visit'],list.map(d=>[uk(d.iso),d.days,d.kind,d.r.customer,d.r.site,d.r.crane_no,d.r.id_no,d.eng,uk(d.r.report_date)]));
   $('dEng').onchange=e=>{dueEng=e.target.value;viewDue();};
   $('dKind').onchange=e=>{dueKind=e.target.value;viewDue();};
   $('dWin').onchange=e=>{dueWin=+e.target.value;viewDue();};
@@ -283,8 +658,10 @@ function viewDue(){
 function viewRepairs(){
   const {open,done}=repairsList();
   const row=x=>`<tr><td>${x.it.status==='URGENT'?'<span class="pill red">URGENT</span>':'<span class="pill amber">REQ ATTN</span>'}</td><td>${esc(x.r.customer)}<div class="mute small">${esc(x.r.site||'')}</div></td><td>${esc(x.r.crane_no||'')}</td><td>${esc(x.it.group)} – ${esc(x.it.label)}${x.it.note?`<div class="small mute">${esc(x.it.note)}</div>`:''}</td><td>${esc(x.eng)}</td><td>${uk(x.r.report_date)}</td></tr>`;
-  $('v-repairs').innerHTML=`<div class="card"><h2>Repairs required <span class="mute small">${open.length} to book in</span></h2><div class="wrap">${open.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${open.map(row).join('')}</table>`:'<span class="mute">No outstanding repairs.</span>'}</div></div>
+  $('v-repairs').innerHTML=`<div class="bar"><span class="mute small">Repairs to book in with customers</span><span class="sp"></span><button id="rCsv" ${open.length?'':'disabled'}>Download CSV</button><button id="rPrint">Print</button></div><div class="card"><h2>Repairs required <span class="mute small">${open.length} to book in</span></h2><div class="wrap">${open.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${open.map(row).join('')}</table>`:'<span class="mute">No outstanding repairs.</span>'}</div></div>
   <div class="card"><h2>Repaired in last 30 days <span class="mute small">${done.length}</span></h2><div class="wrap">${done.length?`<table><tr><th></th><th>Customer</th><th>Crane</th><th>Item</th><th>Engineer</th><th>Reported</th></tr>${done.map(row).join('')}</table>`:'<span class="mute">None recorded.</span>'}</div></div>`;
+  $('rCsv').onclick=()=>csvDownload('repairs_'+todayIso()+'.csv',['Priority','Customer','Site','Crane','Group','Item','Note','Engineer','Reported'],open.map(x=>[x.it.status==='URGENT'?'Urgent':'Req attn',x.r.customer,x.r.site,x.r.crane_no,x.it.group,x.it.label,x.it.note,x.eng,uk(x.r.report_date)]));
+  $('rPrint').onclick=()=>window.print();
 }
 
 function viewPo(){
@@ -298,33 +675,343 @@ function viewPo(){
   });
 }
 
+// ---------- weekly job sheet folders ----------
+// Filed automatically by the Job Manager's "Merge Job Sheets This Week" button: one folder per engineer per week ending (Sunday).
+const firstKey = n => (String(n||'').trim().split(/\s+/)[0]||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const folderBlob = f => api('/storage/v1/object/authenticated/weekly-job-sheets/'+f.file_path).then(r=>r.blob());
+const patchFolder = (id,patch) => api('/rest/v1/weekly_folders?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(patch)});
+function viewFolders(){
+  if(!foldersWeek){ // Monday morning: open the newest week that actually has folders
+    const w=D.folders.map(f=>f.week_ending).sort().pop();
+    foldersWeek = w || addDays(monday(todayIso()),6);
+  }
+  const list=D.folders.filter(f=>f.week_ending===foldersWeek);
+  const uid=(store.get('session')||{}).uid||'';
+  const merged=new Set(list.map(f=>f.engineer_key)), miss={};
+  if(!D.jobsBlocked) weekJobs(addDays(foldersWeek,-6)).forEach(j=>j.engs.forEach(e=>{ const k=firstKey(e); if(k&&k!=='unassigned'&&!merged.has(k)){ (miss[k]=miss[k]||{name:e,n:0}).n++; } }));
+  const missing=Object.values(miss);
+  const pill=f=>f.processed_at?'<span class="pill green">PROCESSED</span>':f.printed_at?'<span class="pill grey">PRINTED</span>':'<span class="pill amber">NEW</span>';
+  const when=s=>new Date(s).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  const row=f=>`<tr><td>${pill(f)}</td><td><b>${esc(f.engineer)}</b></td><td class="r">${esc(f.job_count)}</td><td>${esc(when(f.merged_at))}</td><td><button class="primary" data-fa="open" data-id="${esc(f.id)}">Open / print</button> <button data-fa="printed" data-id="${esc(f.id)}" ${f.printed_at?'disabled':''}>Mark printed</button> <button data-fa="processed" data-id="${esc(f.id)}" ${f.processed_at?'disabled':''}>Mark processed</button></td></tr>`;
+  $('v-folders').innerHTML=`<div class="bar"><button id="fPrev">◀</button><b>Week ending ${uk(foldersWeek)}</b> <span class="mute small">Mon ${uk(addDays(foldersWeek,-6))} to Sun ${uk(foldersWeek)}</span><button id="fNext">▶</button><button id="fNow">Latest</button><span class="sp"></span><button id="fAll" class="primary" ${list.length?'':'disabled'}>Print whole week</button></div>
+  <div class="note">Filed automatically when an engineer presses “Merge Job Sheets This Week” in the Job Manager. Open a folder to print it, or use Print whole week for one combined PDF to print on Monday morning.</div>
+  ${missing.length?`<div class="note"><b>Jobs found but not merged yet:</b> ${missing.map(m=>esc(m.name)+' ('+m.n+' job'+(m.n===1?'':'s')+')').join(', ')}. They need to press Merge Job Sheets This Week in the Job Manager.</div>`:''}
+  <div class="card"><h2>Engineer folders <span class="mute small">${list.length}</span></h2><div class="wrap">${list.length?`<table><tr><th></th><th>Engineer</th><th class="r">Jobs</th><th>Merged</th><th></th></tr>${list.map(row).join('')}</table>`:'<span class="mute">Nothing has been merged for this week yet.</span>'}</div></div>`;
+  $('fPrev').onclick=()=>{foldersWeek=addDays(foldersWeek,-7);viewFolders();};
+  $('fNext').onclick=()=>{foldersWeek=addDays(foldersWeek,7);viewFolders();};
+  $('fNow').onclick=()=>{foldersWeek='';viewFolders();};
+  const fail=e=>{ $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; window.scrollTo({top:0,behavior:'smooth'}); };
+  $('v-folders').querySelectorAll('button[data-fa]').forEach(b=>b.onclick=async()=>{
+    const f=list.find(x=>x.id===b.dataset.id), act=b.dataset.fa; if(!f) return;
+    b.disabled=true;
+    try{
+      if(act==='open'){
+        const w=window.open('','_blank'); // opened first so the browser allows it
+        try{ const url=URL.createObjectURL(await folderBlob(f)); if(w) w.location=url; else location.href=url; }catch(e){ if(w) w.close(); throw e; }
+        b.disabled=false; return;
+      }
+      const now=new Date().toISOString();
+      const patch = act==='printed' ? {printed_at:now,printed_by:uid} : Object.assign({processed_at:now,processed_by:uid}, f.printed_at?{}:{printed_at:now,printed_by:uid});
+      await patchFolder(f.id,patch); await load(); render();
+    }catch(e){ fail(e); b.disabled=false; }
+  });
+  $('fAll').onclick=async()=>{
+    const btn=$('fAll'), label=btn.textContent; btn.disabled=true; btn.textContent='Building print pack…';
+    const w=window.open('','_blank');
+    try{
+      if(!window.PDFLib) throw new Error('The PDF tool did not load. Check your connection and try again.');
+      const out=await PDFLib.PDFDocument.create();
+      for(const f of list){
+        const src=await PDFLib.PDFDocument.load(await (await folderBlob(f)).arrayBuffer());
+        (await out.copyPages(src,src.getPageIndices())).forEach(p=>out.addPage(p));
+      }
+      const url=URL.createObjectURL(new Blob([await out.save()],{type:'application/pdf'}));
+      if(w) w.location=url; else location.href=url;
+    }catch(e){ if(w) w.close(); fail(e); }
+    btn.disabled=false; btn.textContent=label;
+  };
+}
+
+// ---------- engineer holidays ----------
+// 25 days a year (1 Jan to 31 Dec) PLUS the 8 bank holidays. Weekends and bank holidays never count against the 25.
+// Requests come from the Job Manager (pending); admins (Dave, Maxine) approve here. Staff and bank holidays live in Supabase.
+const HOL_DEFAULT_DAYS = 25, HOL_CLASH_AT = 2;   // clash alert = this many people off the same working day
+const HOL_FALLBACK = ['Dave','Rob','Jono','Ricky','Martyn','Jordan','Ashleigh','Maxine'];
+let holMonth = todayIso().slice(0,8)+'01';
+// Only the people in the holiday_approvers table (Dave, Rob, Maxine) can approve. Supabase enforces this too, so a page edit can't bypass it.
+const isAdmin = () => D.hol.approvers.includes((store.get('session')||{}).uid);
+const holStaff = () => { const a=D.hol.staff.filter(s=>s.active).sort((x,y)=>x.sort_order-y.sort_order).map(s=>s.name); return a.length?a:HOL_FALLBACK; };
+const holBank = () => { const m={}; D.hol.bank.forEach(b=>{ m[b.day]=b.name; }); return m; };
+const holLive = () => D.hol.reqs.filter(r=>r.status==='approved'||r.status==='pending');
+const isWork = (s,bank) => { const g=parse(s).getDay(); return g>0&&g<6&&!bank[s]; };
+const holAllow = (n,y) => { const v=D.hol.allow[n+'|'+y]; return v==null?HOL_DEFAULT_DAYS:v; };
+const fmtDay = s => parse(s).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const inDays = s => Math.round((parse(s)-parse(todayIso()))/864e5);
+const holErr = e => { $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; window.scrollTo({top:0,behavior:'smooth'}); };
+const personName = id => { const p=D.people.find(x=>x.id===id); const n=(p&&p.name)||''; return n.charAt(0).toUpperCase()+n.slice(1); };
+function nextWork(s,bank){ let n=addDays(s,1); for(let i=0;i<14&&!isWork(n,bank);i++) n=addDays(n,1); return n; }
+function holWorkDays(r,bank,year){ const out=[]; for(let s=r.start_date;s<=r.end_date;s=addDays(s,1)){ if(year&&s.slice(0,4)!==String(year)) continue; if(isWork(s,bank)) out.push(s); } return out; }
+const holDayCount = (r,bank,year) => holWorkDays(r,bank,year).length*(r.half_day?0.5:1);
+function holOffByDay(from,to,bank){
+  const m={};
+  holLive().forEach(r=>{ for(let s=r.start_date<from?from:r.start_date; s<=r.end_date&&s<=to; s=addDays(s,1)){ if(isWork(s,bank)) (m[s]=m[s]||[]).push({staff:r.staff,status:r.status,half:r.half_day,id:r.id}); } });
+  return m;
+}
+// Runs of working days where HOL_CLASH_AT or more people are off together
+function holClashes(from,to){
+  const bank=holBank(), off=holOffByDay(from,to,bank), out=[]; let prev=null;
+  Object.keys(off).sort().forEach(s=>{
+    const names=[...new Set(off[s].map(x=>x.staff))].sort();
+    if(names.length<HOL_CLASH_AT){ prev=null; return; }
+    const pend=off[s].some(x=>x.status==='pending'), key=names.join('|');
+    if(prev&&prev.key===key&&nextWork(prev.end,bank)===s){ prev.end=s; prev.pending=prev.pending||pend; }
+    else{ prev={start:s,end:s,names,key,pending:pend}; out.push(prev); }
+  });
+  return out;
+}
+function holSummary(){
+  const t=todayIso(), bank=holBank(), live=holLive();
+  return {
+    offToday:[...new Set(live.filter(r=>r.status==='approved'&&r.start_date<=t&&r.end_date>=t&&isWork(t,bank)).map(r=>r.staff))],
+    starting:live.filter(r=>r.start_date>t&&r.start_date<=addDays(t,14)).sort((a,b)=>a.start_date.localeCompare(b.start_date)),
+    clashes:holClashes(t,addDays(t,90)),
+    pending:D.hol.reqs.filter(r=>r.status==='pending').length
+  };
+}
+function holUsed(n,y){
+  const bank=holBank(), t=todayIso(), o={taken:0,booked:0,pending:0};
+  D.hol.reqs.filter(r=>r.staff===n&&(r.status==='approved'||r.status==='pending')).forEach(r=>{
+    const f=r.half_day?0.5:1;
+    holWorkDays(r,bank,y).forEach(s=>{ if(r.status==='pending') o.pending+=f; else if(s<=t) o.taken+=f; else o.booked+=f; });
+  });
+  return o;
+}
+// What a new holiday would cost, who it clashes with, and whether it goes over the allowance
+function holPreview(n,s,e,half){
+  if(!n||!s||!e||e<s) return {days:0,clash:[],over:[],text:'Choose the dates.'};
+  const bank=holBank(), probe={start_date:s,end_date:e,half_day:half}, days=holDayCount(probe,bank);
+  const off=holOffByDay(s,e,bank), clash=new Set();
+  holWorkDays(probe,bank).forEach(d=>{ const others=[...new Set((off[d]||[]).filter(x=>x.staff!==n).map(x=>x.staff))]; if(others.length>=HOL_CLASH_AT-1) others.forEach(o=>clash.add(o)); });
+  const over=[]; const years=[...new Set(holWorkDays(probe,bank).map(d=>d.slice(0,4)))];
+  years.forEach(y=>{ const u=holUsed(n,+y), mine=holDayCount(probe,bank,+y), left=holAllow(n,+y)-u.taken-u.booked-u.pending; if(mine>left) over.push(y+': '+mine+' days asked, '+Math.max(0,left)+' left'); });
+  let text=days+' working day'+(days===1?'':'s')+' (weekends and bank holidays are not counted)';
+  if(clash.size) text+=' · CLASHES with '+[...clash].join(', ');
+  if(over.length) text+=' · OVER ALLOWANCE ('+over.join('; ')+')';
+  return {days,clash:[...clash],over,text};
+}
+
+function viewHols(){
+  const bank=holBank(), staff=holStaff(), t=todayIso(), admin=isAdmin();
+  const first=holMonth, d0=parse(first); d0.setMonth(d0.getMonth()+1); d0.setDate(0); const last=iso(d0);
+  const yr=+first.slice(0,4), sum=holSummary(), off=holOffByDay(first,last,bank);
+  const clashDay=s=>new Set((off[s]||[]).map(x=>x.staff)).size>=HOL_CLASH_AT;
+  const byId={}; D.hol.reqs.forEach(r=>{ byId[r.id]=r; });
+  const days=[]; for(let s=first;s<=last;s=addDays(s,1)) days.push(s);
+  const monthName=parse(first).toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const range=r=>uk(r.start_date)+(r.end_date!==r.start_date?' to '+uk(r.end_date):'')+(r.half_day?' (half day)':'');
+  const statusPill=r=>r.status==='approved'?'<span class="pill green">APPROVED</span>':r.status==='pending'?'<span class="pill amber">PENDING</span>':'<span class="pill grey">'+esc(r.status.toUpperCase())+'</span>';
+
+  // ---- alerts ----
+  const clashHtml=sum.clashes.length?`<div class="err"><b>⚠ Holiday clashes in the next 90 days</b><br>${sum.clashes.map(c=>esc(fmtDay(c.start))+(c.end!==c.start?' to '+esc(fmtDay(c.end)):'')+': '+c.names.map(esc).join(', ')+(c.pending?' <span class="pill amber">includes a pending request</span>':'')).join('<br>')}<div class="small" style="margin-top:6px">Shown when ${HOL_CLASH_AT} or more people are off on the same working day.</div></div>`:'';
+  const pend=D.hol.reqs.filter(r=>r.status==='pending');
+  const pendHtml=pend.length?`<div class="card"><h2>Waiting for approval <span class="mute small">${pend.length}</span></h2><div class="wrap"><table><tr><th>Engineer</th><th>Dates</th><th class="r">Days</th><th>Note</th><th></th></tr>${pend.map(r=>{ const p=holPreview(r.staff,r.start_date,r.end_date,r.half_day); return `<tr><td><b>${esc(r.staff)}</b></td><td>${esc(range(r))}${p.clash.length?`<div class="small" style="color:var(--red)">Clashes with ${esc(p.clash.join(', '))}</div>`:''}${p.over.length?`<div class="small" style="color:var(--red)">Over allowance</div>`:''}</td><td class="r">${holDayCount(r,bank)}</td><td>${esc(r.note||'')}</td><td>${admin?`<button class="primary" data-ha="approve" data-id="${esc(r.id)}">Approve</button> <button data-ha="reject" data-id="${esc(r.id)}">Reject</button>`:`<span class="mute small">Awaiting ${D.hol.approvers.map(personName).filter(Boolean).map(esc).join(', ')||'the office'}</span>`}</td></tr>`; }).join('')}</table></div></div>`:'';
+  const up=holLive().filter(r=>r.end_date>=t&&r.start_date<=addDays(t,30)).sort((a,b)=>a.start_date.localeCompare(b.start_date));
+  const upHtml=`<div class="card"><h2>Off now and coming up <span class="mute small">next 30 days</span></h2>${sum.offToday.length?`<p style="margin:0 0 10px"><b>Off today:</b> ${sum.offToday.map(esc).join(', ')}</p>`:''}${up.length?`<div class="wrap"><table><tr><th></th><th>Engineer</th><th>Dates</th><th class="r">Days</th><th></th></tr>${up.map(r=>{ const d=inDays(r.start_date), soon=d>=0&&d<=14; return `<tr class="${soon?'hsoon':''}"><td>${d<=0?'<span class="pill red">OFF NOW</span>':pill(d)}</td><td><b>${esc(r.staff)}</b></td><td>${esc(range(r))}</td><td class="r">${holDayCount(r,bank)}</td><td>${r.status==='pending'?'<span class="pill amber">PENDING</span>':''}</td></tr>`; }).join('')}</table></div>`:'<span class="mute">Nobody is booked off in the next 30 days.</span>'}</div>`;
+
+  // ---- month grid ----
+  const head=`<tr><th class="who">Engineer</th>${days.map(s=>{ const g=parse(s).getDay(); return `<th class="${g===0||g===6?'we':''} ${bank[s]?'bh':''} ${s===t?'today':''} ${clashDay(s)?'clash':''}" title="${esc(bank[s]||'')}">${+s.slice(8)}<br>${'SMTWTFS'[g]}</th>`; }).join('')}</tr>`;
+  const rows=staff.map(n=>`<tr><td class="who">${esc(n)}</td>${days.map(s=>{
+    const g=parse(s).getDay(), e=(off[s]||[]).find(x=>x.staff===n);
+    if(e){ const r=byId[e.id]; return `<td class="${e.status==='approved'?'ap':'pe'} ${e.half?'half':''} ${clashDay(s)?'cl':''}" title="${esc(n+' · '+e.status+' · '+range(r))}">${e.half?'½':''}</td>`; }
+    return `<td class="${g===0||g===6?'we':''} ${bank[s]?'bh':''}" title="${esc(bank[s]||'')}"></td>`;
+  }).join('')}</tr>`).join('');
+  const gridHtml=`<div class="card"><h2>${esc(monthName)}</h2><div class="wrap"><table class="hgrid"><thead>${head}</thead><tbody>${rows}</tbody></table></div>
+    <div class="hkey"><span><i style="background:var(--green)"></i>Approved</span><span><i style="background:repeating-linear-gradient(45deg,var(--accent) 0 4px,transparent 4px 8px)"></i>Pending</span><span><i style="background:rgba(70,120,210,.35)"></i>Bank holiday</span><span><i style="background:var(--bg)"></i>Weekend</span><span><i style="box-shadow:inset 0 0 0 2px var(--red)"></i>Clash (${HOL_CLASH_AT}+ off)</span></div></div>`;
+
+  // ---- allowances ----
+  const stat=D.hol.bank.filter(b=>b.day.slice(0,4)===String(yr));
+  const allowRows=staff.map(n=>{ const a=holAllow(n,yr), u=holUsed(n,yr), left=a-u.taken-u.booked; return `<tr><td><b>${esc(n)}</b></td><td class="r">${admin?`<input type="number" min="0" step="0.5" value="${a}" data-allow="${esc(n)}" style="width:72px;text-align:right;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--bg)">`:a}</td><td class="r">${u.taken}</td><td class="r">${u.booked}</td><td class="r">${u.pending||'–'}</td><td class="r"><b style="color:${left<0?'var(--red)':'inherit'}">${left}</b>${u.pending?`<div class="small mute">${left-u.pending} if pending approved</div>`:''}</td></tr>`; }).join('');
+  const allowHtml=`<div class="card"><h2>${yr} allowances <span class="mute small">${HOL_DEFAULT_DAYS} days + ${stat.length} bank holidays</span></h2><div class="wrap"><table><tr><th>Engineer</th><th class="r">Allowance</th><th class="r">Taken</th><th class="r">Booked ahead</th><th class="r">Pending</th><th class="r">Left</th></tr>${allowRows}</table></div>
+    <p class="mute small" style="margin:10px 0 0"><b>Bank holidays ${yr}:</b> ${stat.map(b=>esc(uk(b.day))+' '+esc(b.name)).join(' · ')||'none loaded for this year'}. These are on top of the allowance, so weekends and bank holidays are never counted as holiday taken.${admin?' Change a person\'s allowance above for starters or carry-over.':''}</p></div>`;
+
+  // ---- all requests this year ----
+  const yearReqs=D.hol.reqs.filter(r=>r.start_date.slice(0,4)===String(yr)||r.end_date.slice(0,4)===String(yr)).sort((a,b)=>(a.status==='pending'?0:1)-(b.status==='pending'?0:1)||a.start_date.localeCompare(b.start_date));
+  const reqHtml=`<div class="card"><h2>All ${yr} requests <span class="mute small">${yearReqs.length}</span></h2>${yearReqs.length?`<div class="wrap"><table><tr><th></th><th>Engineer</th><th>Dates</th><th class="r">Days</th><th>Note</th><th>Requested by</th>${admin?'<th></th>':''}</tr>${yearReqs.map(r=>`<tr style="${r.status==='rejected'||r.status==='cancelled'?'opacity:.55':''}"><td>${statusPill(r)}</td><td><b>${esc(r.staff)}</b></td><td>${esc(range(r))}</td><td class="r">${holDayCount(r,bank)}</td><td>${esc(r.note||'')}</td><td class="small mute">${esc(personName(r.requested_by))}${r.decided_by?'<br>decided by '+esc(personName(r.decided_by)):''}</td>${admin?`<td>${r.status==='pending'?`<button data-ha="approve" data-id="${esc(r.id)}">Approve</button> <button data-ha="reject" data-id="${esc(r.id)}">Reject</button> `:''}<button data-ha="delete" data-id="${esc(r.id)}">Delete</button></td>`:''}</tr>`).join('')}</table></div>`:'<span class="mute">No holiday requests for this year yet.</span>'}</div>`;
+
+  const formHtml=admin?`<details class="card"><summary>Add a holiday for an engineer (approved straight away)</summary><form id="hForm" style="margin-top:12px"><div class="bar" style="box-shadow:none"><select id="hStaff">${staff.map(n=>`<option>${esc(n)}</option>`).join('')}</select><label class="small mute">From <input type="date" id="hFrom"></label><label class="small mute">To <input type="date" id="hTo"></label><label class="small"><input type="checkbox" id="hHalf"> Half day</label><input id="hNote" placeholder="Note (optional)" style="flex:1;min-width:160px"><button class="primary" type="submit">Add holiday</button></div><div id="hPrevTxt" class="small mute"></div></form></details>`:'';
+
+  $('v-hols').innerHTML=`<div class="bar"><button id="hPrev" aria-label="Previous month">◀</button><b>${esc(monthName)}</b><button id="hNext" aria-label="Next month">▶</button><button id="hNow">This month</button><span class="sp"></span><button id="hPrint">Print</button></div>
+  ${clashHtml}${pendHtml}${gridHtml}${upHtml}${allowHtml}${formHtml}${reqHtml}`;
+
+  const shift=n=>{ const d=parse(holMonth); d.setMonth(d.getMonth()+n); holMonth=iso(d); viewHols(); };
+  $('hPrev').onclick=()=>shift(-1); $('hNext').onclick=()=>shift(1);
+  $('hNow').onclick=()=>{ holMonth=todayIso().slice(0,8)+'01'; viewHols(); };
+  $('hPrint').onclick=()=>window.print();
+  $('v-hols').querySelectorAll('button[data-ha]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.id, act=b.dataset.ha; b.disabled=true;
+    try{
+      if(act==='delete'){ if(!confirm('Delete this holiday request?')){ b.disabled=false; return; } await api('/rest/v1/holiday_requests?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:{Prefer:'return=minimal'}}); }
+      else await api('/rest/v1/holiday_requests?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({status:act==='approve'?'approved':'rejected'})});
+      await load(); render();
+    }catch(e){ holErr(e); b.disabled=false; }
+  });
+  $('v-hols').querySelectorAll('input[data-allow]').forEach(i=>i.onchange=async()=>{
+    try{ await api('/rest/v1/holiday_allowances?on_conflict=staff,year',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({staff:i.dataset.allow,year:yr,allowance:Math.max(0,num(i.value)),updated_at:new Date().toISOString()})}); await load(); render(); }
+    catch(e){ holErr(e); }
+  });
+  if(admin){
+    const prev=()=>{ $('hPrevTxt').textContent=holPreview($('hStaff').value,$('hFrom').value,$('hTo').value||$('hFrom').value,$('hHalf').checked).text; };
+    ['hStaff','hFrom','hTo','hHalf'].forEach(id=>$(id).addEventListener('input',prev));
+    $('hFrom').addEventListener('change',()=>{ if(!$('hTo').value||$('hTo').value<$('hFrom').value) $('hTo').value=$('hFrom').value; prev(); });
+    $('hForm').onsubmit=async e=>{
+      e.preventDefault();
+      const n=$('hStaff').value, s=$('hFrom').value, en=$('hTo').value||s, half=$('hHalf').checked;
+      if(!s||en<s){ holErr(new Error('Pick a start date, and an end date that is not before it.')); return; }
+      if(half&&s!==en){ holErr(new Error('A half day can only be a single day.')); return; }
+      const p=holPreview(n,s,en,half);
+      if((p.clash.length||p.over.length)&&!confirm(p.text+'\n\nAdd it anyway?')) return;
+      const btn=$('hForm').querySelector('button[type=submit]'); btn.disabled=true;
+      try{ await api('/rest/v1/holiday_requests',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({staff:n,start_date:s,end_date:en,half_day:half,note:$('hNote').value.trim()||null,status:'approved'})}); await load(); render(); }
+      catch(err){ holErr(err); btn.disabled=false; }
+    };
+  }
+}
+
+// ---------- customer portals ----------
+// Links and numbers for customers' supplier portals, so the office can get to them quickly. Office (admin logins) only.
+// There is deliberately no password field: keep logins in a proper password manager.
+const portalOK = () => !!(D.profile && D.profile.role==='admin');
+let portalQ = '', portalEdit = null;
+const portalUrl = u => { u=String(u||'').trim(); if(!u) return ''; if(!/^[a-z][a-z0-9+.-]*:/i.test(u)) u='https://'+u; return /^https?:\/\//i.test(u)?u:''; };
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){ const a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0'; document.body.appendChild(a); a.select(); let ok=false; try{ ok=document.execCommand('copy'); }catch(x){} a.remove(); return ok; }
+}
+function viewPortals(){
+  const names=[...new Set(D.jobs.map(j=>(j.data||{}).customerName||(j.data||{}).customer).filter(Boolean).concat(D.portals.map(p=>p.customer)))].sort((a,b)=>a.localeCompare(b));
+  const e=portalEdit?D.portals.find(p=>p.id===portalEdit):null;
+  $('v-portals').innerHTML=`<div class="bar"><input id="pSearch" type="search" placeholder="Search customer, portal or number…" value="${esc(portalQ)}" style="flex:1;min-width:200px" autocomplete="off"><span class="mute small" id="pCount"></span></div>
+  <details class="card" ${e?'open':''} id="pDetails"><summary>${e?'Edit portal entry':'Add a customer portal'}</summary><form id="pForm" style="margin-top:12px">
+    <div class="bar" style="box-shadow:none;align-items:flex-end">
+      <label class="small mute" style="flex:1;min-width:180px">Customer<input id="pCust" list="pCustList" required value="${esc(e?e.customer:'')}" style="width:100%"></label>
+      <label class="small mute" style="flex:1;min-width:150px">Portal name<input id="pName" placeholder="e.g. Coupa, SAP Ariba, supplier portal" value="${esc(e?e.portal_name:'')}" style="width:100%"></label>
+      <label class="small mute" style="flex:1;min-width:150px">Our number<input id="pNum" placeholder="supplier / vendor / account no." value="${esc(e?e.number:'')}" style="width:100%"></label>
+    </div>
+    <div class="bar" style="box-shadow:none;align-items:flex-end">
+      <label class="small mute" style="flex:2;min-width:220px">Portal link<input id="pUrl" placeholder="https://…" value="${esc(e?e.url:'')}" style="width:100%"></label>
+      <label class="small mute" style="flex:2;min-width:220px">Notes<input id="pNotes" placeholder="contact, how to raise an invoice…" value="${esc(e?e.notes:'')}" style="width:100%"></label>
+      <button class="primary" type="submit">${e?'Save changes':'Add portal'}</button>${e?'<button type="button" id="pCancel">Cancel</button>':''}
+    </div>
+    <datalist id="pCustList">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+    <div class="mute small">Don't store passwords here. Numbers and links only.</div></form></details>
+  <div id="pList"></div>`;
+  const list=()=>{
+    const q=portalQ.trim().toLowerCase();
+    const rows=D.portals.filter(p=>!q||[p.customer,p.portal_name,p.number,p.notes,p.url].join(' ').toLowerCase().includes(q));
+    $('pCount').textContent=rows.length+' of '+D.portals.length;
+    $('pList').innerHTML=rows.length?`<div class="card"><div class="wrap"><table><tr><th>Customer</th><th>Portal</th><th>Our number</th><th>Notes</th><th></th></tr>${rows.map(p=>{ const u=portalUrl(p.url); return `<tr><td><b>${esc(p.customer)}</b></td><td>${esc(p.portal_name||'')}</td><td>${p.number?`<span style="font-variant-numeric:tabular-nums;font-weight:700">${esc(p.number)}</span> <button data-pc="${esc(p.id)}" aria-label="Copy number">Copy</button>`:'<span class="mute">–</span>'}</td><td class="small">${esc(p.notes||'')}</td><td style="white-space:nowrap">${u?`<button class="primary" data-po="${esc(p.id)}">Open portal ↗</button> `:''}<button data-pe="${esc(p.id)}">Edit</button> <button data-pd="${esc(p.id)}">Delete</button></td></tr>`; }).join('')}</table></div></div>`
+      :`<div class="card"><div class="empty-state">${D.portals.length?'No matches.':'No customer portals saved yet. Use “Add a customer portal” above.'}</div></div>`;
+    $('pList').querySelectorAll('button[data-po]').forEach(b=>b.onclick=()=>{ const p=D.portals.find(x=>x.id===b.dataset.po); const u=p&&portalUrl(p.url); if(u) window.open(u,'_blank','noopener'); });
+    $('pList').querySelectorAll('button[data-pc]').forEach(b=>b.onclick=async()=>{ const p=D.portals.find(x=>x.id===b.dataset.pc); const ok=await copyText(p.number); b.textContent=ok?'Copied ✓':'Press and hold the number'; setTimeout(()=>{b.textContent='Copy';},1600); });
+    $('pList').querySelectorAll('button[data-pe]').forEach(b=>b.onclick=()=>{ portalEdit=b.dataset.pe; viewPortals(); window.scrollTo({top:0,behavior:'smooth'}); });
+    $('pList').querySelectorAll('button[data-pd]').forEach(b=>b.onclick=async()=>{
+      const p=D.portals.find(x=>x.id===b.dataset.pd); if(!confirm('Delete the portal entry for '+p.customer+'?')) return; b.disabled=true;
+      try{ await api('/rest/v1/customer_portals?id=eq.'+encodeURIComponent(p.id),{method:'DELETE',headers:{Prefer:'return=minimal'}}); await load(); render(); }
+      catch(err){ holErr(err); b.disabled=false; }
+    });
+  };
+  list();
+  $('pSearch').oninput=ev=>{ portalQ=ev.target.value; list(); };
+  if($('pCancel')) $('pCancel').onclick=()=>{ portalEdit=null; viewPortals(); };
+  $('pForm').onsubmit=async ev=>{
+    ev.preventDefault();
+    const urlIn=$('pUrl').value.trim(), url=portalUrl(urlIn);
+    if(urlIn&&!url){ holErr(new Error('The portal link must start with http:// or https://')); return; }
+    const body={customer:$('pCust').value.trim(),portal_name:$('pName').value.trim()||null,number:$('pNum').value.trim()||null,url:url||null,notes:$('pNotes').value.trim()||null,updated_at:new Date().toISOString()};
+    const btn=$('pForm').querySelector('button[type=submit]'); btn.disabled=true;
+    try{
+      if(e) await api('/rest/v1/customer_portals?id=eq.'+encodeURIComponent(e.id),{method:'PATCH',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(body)});
+      else await api('/rest/v1/customer_portals',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(body)});
+      portalEdit=null; await load(); render();
+    }catch(err){ holErr(err); btn.disabled=false; }
+  };
+}
+
+// ---------- global command-room search ----------
+function runGlobalSearch(){
+  const input=$('globalSearch'), box=$('searchResults');
+  if(!input||!box) return;
+  const q=input.value.trim().toLowerCase();
+  if(!q){box.classList.add('hide');box.innerHTML='';return;}
+  const hits=[];
+  const has=v=>String(v==null?'':v).toLowerCase().includes(q);
+  D.jobs.forEach(j=>{
+    const d=j.data||{};
+    const hay=[d.job,j.id,d.customerName,d.customer,d.site,d.type,d.status,...(d.engineers||[])].join(' ');
+    if(has(hay)) hits.push({type:'Job sheet',main:(d.job||j.id)+' · '+(d.customerName||d.customer||'Customer not set'),sub:[d.site,d.type,d.status].filter(Boolean).join(' · '),tab:'week',key:j.id,week:((d.time||[])[0]||{}).date||d.date||''});
+  });
+  D.reports.forEach(r=>{
+    const hay=[r.report_no,r.customer,r.crane_no,r.id_no,r.visit_type,r.engineer,r.site,r.report_date].join(' ');
+    if(has(hay)) hits.push({type:'Service / LOLER report',main:(r.report_no||'Report')+' · '+(r.customer||'Customer not set'),sub:[r.visit_type,r.crane_no?'Crane '+r.crane_no:'',r.site,uk(r.report_date)].filter(Boolean).join(' · '),tab:'due',key:r.id});
+  });
+  D.pos.forEach(p=>{
+    const hay=[p.po_number,p.engineer_name,p.site_ref,p.description,p.status,p.requested_by].join(' ');
+    if(has(hay)) hits.push({type:'Purchase order',main:(p.po_number||'PO request')+' · '+(p.site_ref||p.engineer_name||'Request'),sub:[p.status,p.description].filter(Boolean).join(' · '),tab:'po',key:p.id});
+  });
+  D.bookings.forEach(b=>{
+    const hay=[b.customer,b.site,b.contact,b.phone,b.description,b.job_type,b.engineer_name,b.status].join(' ');
+    if(has(hay)) hits.push({type:'Booking',main:(b.customer||'Booking')+' · '+(b.site||''),sub:[b.status,b.job_type,b.engineer_name].filter(Boolean).join(' · '),tab:'bookings',key:b.id});
+  });
+  const limited=hits.slice(0,30);
+  box.innerHTML=`<div class="result-head">${hits.length} matching record${hits.length===1?'':'s'}${hits.length>30?' · showing first 30':''}</div>`+
+    (limited.length?limited.map((h,i)=>`<div class="result" role="button" tabindex="0" data-hit="${i}"><div class="result-type">${esc(h.type)}</div><div><div class="result-main">${esc(h.main)}</div><div class="result-sub">${esc(h.sub)}</div></div><div class="result-go">Open section →</div></div>`).join(''):`<div class="empty-state">No matching records in the data currently loaded. Try a customer name, crane number, job number or PO reference.</div>`);
+  box.classList.remove('hide');
+  box.querySelectorAll('[data-hit]').forEach(el=>{
+    const open=()=>{const h=limited[+el.dataset.hit];if(h.tab==='week'&&h.week)weekStart=monday(h.week);tab=h.tab;store.set('tab',tab);render();box.classList.add('hide');input.blur();};
+    el.onclick=open;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+  });
+}
+
 // ---------- shell ----------
-const TABS=[['overview','Overview'],['week','Week by engineer'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders']];
+const TABS=[['overview','Overview'],['today','Today'],['bookings','Bookings'],['week','Week by engineer'],['folders','Weekly folders'],['hols','Holidays'],['due','Due soon'],['repairs','Repairs'],['po','Purchase orders'],['portals','Customer portals']];
 function render(){
+  if(tab==='portals'&&!portalOK()) tab='overview';
   const due=dueList(), rep=repairsList();
-  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length};
-  $('tabs').innerHTML=TABS.map(([k,l])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${badge[k]?`<span class="n ${k==='due'?'hot':''}">${badge[k]}</span>`:''}</button>`).join('');
+  const badge={due:due.filter(d=>d.days<0).length, repairs:rep.open.length, po:D.pos.filter(p=>p.status==='pending').length, bookings:D.bookings.filter(b=>b.status==='booked').length, folders:D.folders.filter(f=>!f.printed_at).length, hols:D.hol.reqs.filter(r=>r.status==='pending').length};
+  $('tabs').innerHTML=TABS.filter(([k])=>k!=='portals'||portalOK()).map(([k,l])=>`<button data-t="${k}" class="${k===tab?'on':''}">${l}${badge[k]?`<span class="n ${k==='due'||(k==='hols'&&holSummary().clashes.length)?'hot':''}">${badge[k]}</span>`:''}</button>`).join('');
   $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;store.set('tab',tab);render();});
   TABS.forEach(([k])=>$('v-'+k).classList.toggle('hide',k!==tab));
-  ({overview:viewOverview,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo})[tab]();
+  ({overview:viewOverview,today:viewToday,bookings:viewBookings,week:viewWeek,due:viewDue,repairs:viewRepairs,po:viewPo,folders:viewFolders,hols:viewHols,portals:viewPortals})[tab]();
 }
 async function refresh(){ $('refresh').disabled=true; try{ await load(); render(); }catch(e){ if(!store.get('session')) showLogin(e.message); else $('msg').innerHTML='<div class="err">'+esc(e.message)+'</div>'; } finally{ $('refresh').disabled=false; } }
-function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').classList.toggle('hide',!m); $('loginErr').textContent=m||''; }
+function showLogin(m){ $('app').classList.add('hide'); $('login').classList.remove('hide'); $('loginErr').className='err'+(m?'':' hide'); $('loginErr').textContent=m||''; }
 async function showApp(){ $('login').classList.add('hide'); $('app').classList.remove('hide'); const s=store.get('session')||{}; $('who').textContent=s.email||''; tab=store.get('tab')||'overview'; if(!TABS.some(t=>t[0]===tab)) tab='overview'; await refresh(); }
 
 $('go').onclick=async()=>{
   $('go').disabled=true;
   try{
     const res=await fetch(SB.url+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:$('em').value.trim(),password:$('pw').value})});
-    const j=await res.json();
-    if(!res.ok) throw new Error(j.error_description||j.msg||'Sign-in failed');
+    const j=await res.json().catch(()=>({}));
+    if(!res.ok){ const m=j.error_description||j.msg||j.message||''; throw new Error(/invalid/i.test(m)?"That email or password isn't right. Use your full email address.":(m||'Sign-in failed ('+res.status+')')); }
     saveSession(j); $('pw').value=''; await showApp();
-  }catch(e){ showLogin(e.message); }
+  }catch(e){ showLogin(e.name==='TypeError'?'No connection — check your signal and try again.':e.message); }
   $('go').disabled=false;
+};
+$('forgot').onclick=async()=>{
+  const em=$('em').value.trim(), box=$('loginErr');
+  if(!em){ showLogin('Type your email address above first, then tap Forgot password.'); return; }
+  try{
+    const res=await fetch(SB.url+'/auth/v1/recover',{method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},body:JSON.stringify({email:em})});
+    if(res.ok){ box.className='note'; box.textContent='If that email has an account, a reset link is on its way. Open it on this device.'; }
+    else showLogin('Could not send the reset email ('+res.status+').');
+  }catch(e){ showLogin('No connection — check your signal and try again.'); }
 };
 $('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') $('go').click(); });
 $('out').onclick=()=>{ store.del('session'); showLogin(''); };
 $('refresh').onclick=refresh;
+$('globalSearch').addEventListener('input',runGlobalSearch);
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Escape'){$('globalSearch').value='';runGlobalSearch();}});
+$('controlStatus').textContent='Signed-in session · last refresh shown on dashboard';
 setInterval(()=>{ if(store.get('session') && !document.hidden) refresh(); }, 5*60*1000);
 if(store.get('session')) showApp(); else showLogin('');
 </script>
